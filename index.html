@@ -7,10 +7,11 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 
+<!-- CSS FILE -->
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -21,9 +22,11 @@
 <nav>
   <div class="nav-inner">
     <a class="logo" href="#">creator<span>find</span></a>
+
     <div class="nav-actions">
       <button class="btn-ghost">List your profile</button>
       <button class="btn-accent">I'm a brand</button>
+
       <button class="btn-accent" onclick="connectInstagram()">
         Connect Instagram
       </button>
@@ -31,16 +34,142 @@
   </div>
 </nav>
 
-<!-- KEEP EVERYTHING ELSE EXACTLY SAME -->
-<!-- (Do NOT change any UI code below) -->
+<!-- HERO -->
+<div class="container">
+  <section class="hero">
+    <div class="hero-eyebrow">India's #1 Creator Discovery Platform</div>
 
-<!-- your full body content stays exactly as you wrote -->
+    <h1>Find the perfect<em>ad creator.</em></h1>
 
+    <p>
+      Discover authentic Indian creators across every niche. Filter by genre,
+      audience size, and engagement — then connect instantly.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="val" id="stat-count">0</span>
+        <span class="lbl">Creators listed</span>
+      </div>
+
+      <div class="hero-stat">
+        <span class="val">12+</span>
+        <span class="lbl">Genres covered</span>
+      </div>
+
+      <div class="hero-stat">
+        <span class="val">500+</span>
+        <span class="lbl">Brands connected</span>
+      </div>
+
+      <div class="hero-stat">
+        <span class="val">₹0</span>
+        <span class="lbl">Platform fee</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="filter-section">
+    <div class="filter-top">
+      <span class="filter-label">Genre</span>
+
+      <div class="genre-pills" id="genrePills">
+        <button class="pill active" data-genre="all">All</button>
+        <button class="pill" data-genre="fashion">👗 Fashion</button>
+        <button class="pill" data-genre="fitness">💪 Fitness</button>
+        <button class="pill" data-genre="food">🍜 Food</button>
+        <button class="pill" data-genre="tech">📱 Tech</button>
+        <button class="pill" data-genre="travel">✈️ Travel</button>
+        <button class="pill" data-genre="beauty">💄 Beauty</button>
+        <button class="pill" data-genre="finance">📊 Finance</button>
+        <button class="pill" data-genre="gaming">🎮 Gaming</button>
+        <button class="pill" data-genre="lifestyle">🌟 Lifestyle</button>
+        <button class="pill" data-genre="comedy">😂 Comedy</button>
+      </div>
+    </div>
+
+    <div class="filter-bottom">
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Min followers</label>
+        <div class="range-wrap">
+          <input type="range" id="minF" min="0" max="10" value="0" step="1">
+          <span class="range-val" id="minFVal">Any</span>
+        </div>
+      </div>
+
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Max followers</label>
+        <div class="range-wrap">
+          <input type="range" id="maxF" min="0" max="10" value="10" step="1">
+          <span class="range-val" id="maxFVal">10M+</span>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Creator tier</label>
+        <select id="tierSel">
+          <option value="all">All tiers</option>
+          <option value="nano">Nano (1k–10k)</option>
+          <option value="micro">Micro (10k–100k)</option>
+          <option value="macro">Macro (100k–1M)</option>
+          <option value="mega">Mega (1M+)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Sort by</label>
+        <select id="sortSel">
+          <option value="followers">Most followers</option>
+          <option value="engagement">Best engagement</option>
+          <option value="views">Most reel views</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <div class="results-bar">
+    <div class="results-count">
+      Showing <span id="countDisplay">0</span> creators
+    </div>
+
+    <div class="summary-pills">
+      <div class="summary-pill">Avg reach: <strong id="statReach">—</strong></div>
+      <div class="summary-pill">Avg engagement: <strong id="statEng">—</strong></div>
+      <div class="summary-pill">Total audience: <strong id="statTotal">—</strong></div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="detail-panel" id="detailPanel"></div>
+
+  <!-- GRID -->
+  <div class="creators-grid" id="grid"></div>
+
+  <div class="empty" id="empty">
+    <div class="empty-icon">🔍</div>
+    <h3>No creators found</h3>
+    <p>Try broadening your filters to see more creators.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
-  <div>Built with ♥ in India · <a href="#">Add your profile</a> · <a href="#">For brands</a> · <a href="#">Contact</a></div>
-  <div style="margin-top:6px;font-size:12px">© 2025 CreatorFind. All data is curated manually.</div>
+  <div>
+    Built with ♥ in India ·
+    <a href="#">Add your profile</a> ·
+    <a href="#">For brands</a> ·
+    <a href="#">Contact</a>
+  </div>
+
+  <div style="margin-top:6px;font-size:12px">
+    © 2025 CreatorFind. All data is curated manually.
+  </div>
 </footer>
 
+<!-- JS FILE -->
 <script src="script.js"></script>
+
 </body>
 </html>
