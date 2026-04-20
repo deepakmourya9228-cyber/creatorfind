@@ -892,25 +892,7 @@ const TIERS = {
   mega:  { label:'Mega',  bg:'rgba(255,95,160,0.15)', color:'#ff5fa0' },
 };
 
-const creators = [
-  { id:1,  name:"Priya Sharma",     handle:"@priyastyled",  genre:"fashion",   followers:820000,  eng:4.2, views:1200000, avatar:"PS", icon:"👗", bio:"Fashion & lifestyle creator from Mumbai. Iconic lookbooks, brand collabs & street style content loved by 800K+ followers.", rate:"₹45,000", reels:[{e:"👗",v:"2.1M"},{e:"💄",v:"980K"},{e:"✨",v:"750K"},{e:"🛍",v:"600K"}] },
-  { id:2,  name:"Arjun Fitness",    handle:"@arjunfit",     genre:"fitness",   followers:340000,  eng:6.8, views:890000,  avatar:"AF", icon:"💪", bio:"Certified trainer & fitness educator. Workout tips, nutrition science & transformation stories.", rate:"₹22,000", reels:[{e:"💪",v:"1.4M"},{e:"🏋",v:"800K"},{e:"🥗",v:"420K"},{e:"🏃",v:"380K"}] },
-  { id:3,  name:"Riya Eats",        handle:"@riyaeats",     genre:"food",      followers:1500000, eng:5.1, views:3200000, avatar:"RE", icon:"🍜", bio:"Restaurant reviews, street food adventures & quick recipes across India. Foodie at heart, creator by passion.", rate:"₹80,000", reels:[{e:"🍜",v:"5.2M"},{e:"🍕",v:"3.1M"},{e:"🥘",v:"2.8M"},{e:"🧆",v:"1.9M"}] },
-  { id:4,  name:"TechWala Raj",     handle:"@techwalaraj",  genre:"tech",      followers:280000,  eng:7.3, views:620000,  avatar:"TR", icon:"📱", bio:"Unboxings, reviews & tech tips in Hindi. Making technology accessible to every Indian.", rate:"₹18,000", reels:[{e:"📱",v:"1.1M"},{e:"💻",v:"700K"},{e:"🎮",v:"500K"},{e:"📡",v:"320K"}] },
-  { id:5,  name:"Wanderer Meera",   handle:"@meerawanders",  genre:"travel",   followers:95000,   eng:8.9, views:410000,  avatar:"WM", icon:"✈️", bio:"Solo female traveller sharing budget tips & hidden gems across India & South East Asia.", rate:"₹8,000",  reels:[{e:"🏔",v:"620K"},{e:"🏖",v:"390K"},{e:"🌅",v:"280K"},{e:"🗺",v:"210K"}] },
-  { id:6,  name:"Glamour by Sana",  handle:"@sanaglam",     genre:"beauty",    followers:2100000, eng:4.5, views:4800000, avatar:"GS", icon:"💅", bio:"Makeup tutorials, skincare reviews & beauty hacks trusted by 2M+ fans. Brand partnerships open.", rate:"₹1,20,000", reels:[{e:"💄",v:"7.8M"},{e:"✨",v:"4.2M"},{e:"💅",v:"3.1M"},{e:"🪞",v:"2.4M"}] },
-  { id:7,  name:"Dev Finance",      handle:"@devfinance",   genre:"finance",   followers:410000,  eng:5.6, views:780000,  avatar:"DF", icon:"📊", bio:"Stocks, mutual funds & personal finance simplified for everyday Indians. SEBI registered.", rate:"₹28,000", reels:[{e:"📊",v:"1.3M"},{e:"💰",v:"900K"},{e:"📈",v:"600K"},{e:"🏦",v:"450K"}] },
-  { id:8,  name:"GamingWithKaran",  handle:"@karangames",   genre:"gaming",    followers:760000,  eng:9.1, views:2100000, avatar:"GK", icon:"🎮", bio:"BGMI, mobile gaming & esports. The fastest growing gaming channel in India with the best community.", rate:"₹38,000", reels:[{e:"🎮",v:"3.4M"},{e:"🏆",v:"2.1M"},{e:"⚡",v:"1.8M"},{e:"🎯",v:"1.5M"}] },
-  { id:9,  name:"Naina Style",      handle:"@nainastyle",   genre:"fashion",   followers:58000,   eng:10.2,views:180000,  avatar:"NS", icon:"👠", bio:"Sustainable fashion & thrift hauls. Micro-influencer with sky-high engagement and authentic community.", rate:"₹5,000",  reels:[{e:"👠",v:"280K"},{e:"👜",v:"190K"},{e:"🛍",v:"120K"},{e:"🌿",v:"95K"}] },
-  { id:10, name:"Chef Vikram",      handle:"@chefvikram",   genre:"food",      followers:430000,  eng:6.2, views:950000,  avatar:"CV", icon:"👨‍🍳", bio:"5-star chef turned creator. Gourmet recipes made simple — from your home kitchen.", rate:"₹30,000", reels:[{e:"👨‍🍳",v:"1.6M"},{e:"🍳",v:"1.1M"},{e:"🥩",v:"700K"},{e:"🍰",v:"560K"}] },
-  { id:11, name:"Ananya Wellness",  handle:"@ananyafit",    genre:"fitness",   followers:72000,   eng:11.4,views:320000,  avatar:"AW", icon:"🧘", bio:"Yoga, pilates & mindful wellness in Hindi & English. India's most trusted wellness micro-creator.", rate:"₹6,500",  reels:[{e:"🧘",v:"480K"},{e:"🏃",v:"310K"},{e:"🥦",v:"200K"},{e:"🌸",v:"170K"}] },
-  { id:12, name:"TravelBro Sid",    handle:"@travelsidd",   genre:"travel",    followers:1800000, eng:3.8, views:2900000, avatar:"TS", icon:"🌍", bio:"International travel, luxury stays & adventure sports. Collab inquiries welcome.", rate:"₹95,000", reels:[{e:"🌍",v:"4.2M"},{e:"🏄",v:"2.8M"},{e:"🏕",v:"1.9M"},{e:"🚀",v:"1.4M"}] },
-  { id:13, name:"Memes by Sahil",   handle:"@sahilmemes",   genre:"comedy",    followers:1200000, eng:12.1,views:5100000, avatar:"MS", icon:"😂", bio:"India's most viral comedy creator. Relatable memes, skits & trending audio content for Gen Z.", rate:"₹65,000", reels:[{e:"😂",v:"8.1M"},{e:"🤣",v:"5.6M"},{e:"🎭",v:"3.9M"},{e:"⚡",v:"2.8M"}] },
-  { id:14, name:"Neha Lifestyle",   handle:"@nehavibes",    genre:"lifestyle", followers:390000,  eng:7.8, views:820000,  avatar:"NL", icon:"🌟", bio:"Morning routines, home decor & mindful living. Aesthetic content that inspires real change.", rate:"₹24,000", reels:[{e:"🌟",v:"1.2M"},{e:"🏡",v:"780K"},{e:"☕",v:"530K"},{e:"📚",v:"410K"}] },
-  { id:15, name:"StartupWala",      handle:"@startupwala",  genre:"finance",   followers:88000,   eng:9.3, views:290000,  avatar:"SW", icon:"🚀", bio:"Startup stories, founder interviews & business tips for the next generation of Indian entrepreneurs.", rate:"₹7,000",  reels:[{e:"🚀",v:"450K"},{e:"💡",v:"320K"},{e:"📈",v:"240K"},{e:"🤝",v:"180K"}] },
-  { id:16, name:"Preet Comedy",     handle:"@preetcomedy",  genre:"comedy",    followers:3400000, eng:8.6, views:8900000, avatar:"PC", icon:"🎭", bio:"Viral comedy skits & Punjabi humor. One of India's top comedy creators with massive loyal fanbase.", rate:"₹2,00,000",reels:[{e:"🎭",v:"12M"},{e:"😂",v:"9.4M"},{e:"🤣",v:"7.2M"},{e:"⚡",v:"5.8M"}] },
-];
-
+let creators = [];
 // ─── STATE ──────────────────────────────────────────
 let activeGenre = 'all';
 let selectedId = null;
@@ -1140,7 +1122,7 @@ document.getElementById('tierSel').addEventListener('change', render);
 document.getElementById('sortSel').addEventListener('change', render);
 
 // ─── INIT ────────────────────────────────────────────
-render();
+loadCreators();
 
 // Animate hero stat counter
 let count = 0;
