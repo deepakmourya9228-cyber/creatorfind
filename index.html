@@ -909,30 +909,15 @@
 const FLEVELS = ["Any","1K","5K","10K","50K","100K","250K","500K","1M","5M","10M+"];
 const FVALUES = [0,1000,5000,10000,50000,100000,250000,500000,1000000,5000000,Infinity];
 
-const COLORS = {
-  fashion:   { bg:'rgba(255,95,160,0.15)',  text:'#ff5fa0',  tile:'rgba(255,95,160,0.2)' },
-  fitness:   { bg:'rgba(200,241,53,0.12)',  text:'#c8f135',  tile:'rgba(200,241,53,0.18)' },
-  food:      { bg:'rgba(255,140,66,0.15)',  text:'#ff8c42',  tile:'rgba(255,140,66,0.2)' },
-  tech:      { bg:'rgba(95,180,255,0.15)',  text:'#5fb4ff',  tile:'rgba(95,180,255,0.2)' },
-  travel:    { bg:'rgba(45,212,191,0.15)',  text:'#2dd4bf',  tile:'rgba(45,212,191,0.2)' },
-  beauty:    { bg:'rgba(168,85,247,0.15)',  text:'#a855f7',  tile:'rgba(168,85,247,0.2)' },
-  finance:   { bg:'rgba(250,204,21,0.12)',  text:'#facc15',  tile:'rgba(250,204,21,0.18)' },
-  gaming:    { bg:'rgba(168,85,247,0.15)',  text:'#a855f7',  tile:'rgba(168,85,247,0.2)' },
-  lifestyle: { bg:'rgba(45,212,191,0.15)',  text:'#2dd4bf',  tile:'rgba(45,212,191,0.2)' },
-  comedy:    { bg:'rgba(255,140,66,0.15)',  text:'#ff8c42',  tile:'rgba(255,140,66,0.2)' },
-};
+const creators = [
+  { id:1, name:"Priya Sharma", handle:"@priyastyled", genre:"fashion", followers:820000, eng:4.2, views:1200000, avatar:"PS", icon:"👗", bio:"Fashion & lifestyle creator from Mumbai.", rate:"₹45,000", reels:[{e:"👗",v:"2.1M"},{e:"💄",v:"980K"},{e:"✨",v:"750K"}] },
+  { id:2, name:"Arjun Fitness", handle:"@arjunfit", genre:"fitness", followers:340000, eng:6.8, views:890000, avatar:"AF", icon:"💪", bio:"Fitness educator.", rate:"₹22,000", reels:[{e:"💪",v:"1.4M"},{e:"🏋",v:"800K"},{e:"🥗",v:"420K"}] }
+];
 
-const TIERS = {
-  nano:  { label:'Nano',  bg:'rgba(45,212,191,0.15)',  color:'#2dd4bf' },
-  micro: { label:'Micro', bg:'rgba(95,180,255,0.15)',  color:'#5fb4ff' },
-  macro: { label:'Macro', bg:'rgba(168,85,247,0.15)', color:'#a855f7' },
-  mega:  { label:'Mega',  bg:'rgba(255,95,160,0.15)', color:'#ff5fa0' },
-};
-
-let creators = [];
 // ─── STATE ──────────────────────────────────────────
 let activeGenre = 'all';
 let selectedId = null;
+let isConnected = false;
 
 // ─── HELPERS ────────────────────────────────────────
 function fmt(n) {
@@ -941,201 +926,11 @@ function fmt(n) {
   return n.toString();
 }
 
-function tierOf(f) {
-  if (f < 10000) return 'nano';
-  if (f < 100000) return 'micro';
-  if (f < 1000000) return 'macro';
-  return 'mega';
-}
-
 function getColor(genre) {
-  return COLORS[genre] || { bg:'rgba(122,122,144,0.15)', text:'#7a7a90', tile:'rgba(122,122,144,0.2)' };
+  return { bg:'rgba(200,241,53,0.12)', text:'#c8f135', tile:'rgba(200,241,53,0.18)' };
 }
 
-function fakeConnect(btn) {
-  btn.innerText = "Connecting...";
-  
-  setTimeout(() => {
-    btn.innerText = "Connected ✓";
-    btn.style.background = "#2dd4bf";
-  }, 1200);
-}
-// ─── FILTER ─────────────────────────────────────────
-function getFiltered() {
-  const minF = FVALUES[+document.getElementById('minF').value];
-  const maxF = FVALUES[+document.getElementById('maxF').value];
-  const tier = document.getElementById('tierSel').value;
-  const sort = document.getElementById('sortSel').value;
-
-  let list = creators.filter(c => {
-    if (activeGenre !== 'all' && c.genre !== activeGenre) return false;
-    if (c.followers < minF) return false;
-    if (c.followers > maxF) return false;
-    if (tier !== 'all' && tierOf(c.followers) !== tier) return false;
-    return true;
-  });
-
-  if (sort === 'followers') list.sort((a,b) => b.followers - a.followers);
-  else if (sort === 'engagement') list.sort((a,b) => b.eng - a.eng);
-  else list.sort((a,b) => b.views - a.views);
-
-  return list;
-}
-
-// ─── RENDER CARD ────────────────────────────────────
-function renderCard(c, delay) {
-  const col = getColor(c.genre);
-  const t = TIERS[tierOf(c.followers)];
-  const reelsHtml = c.reels.slice(0,3).map(r => `
-    <div class="reel-chip" style="background:${col.tile}">
-      <span style="font-size:18px">${r.e}</span>
-      <span class="reel-views">${r.v}</span>
-    </div>`).join('');
-
-  return `
-  <div class="creator-card${selectedId===c.id?' selected':''}"
-       style="animation-delay:${delay}ms"
-       onclick="openDetail(${c.id})">
-    <div class="tier-badge" style="background:${t.bg};color:${t.color}">${t.label}</div>
-    <div class="card-cover" style="background:${col.bg}">
-      <span style="font-size:36px">${c.icon}</span>
-    </div>
-    <div class="card-body">
-      <div class="card-avatar" style="background:${col.bg};color:${col.text}">${c.avatar}</div>
-      <div class="card-name">${c.name}</div>
-      <div class="card-handle">${c.handle}</div>
-      <div class="card-genre" style="background:${col.bg};color:${col.text}">${c.genre}</div>
-      <div class="card-reels">${reelsHtml}</div>
-      <div class="card-meta">
-        <div class="meta-item">
-          <span class="meta-val">${fmt(c.followers)}</span>
-          <span class="meta-lbl">Followers</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-val">${c.eng}%</span>
-          <span class="meta-lbl">Engagement</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-val">${fmt(c.views)}</span>
-          <span class="meta-lbl">Avg views</span>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ─── RENDER DETAIL ───────────────────────────────────
-function renderDetail(c) {
-  const col = getColor(c.genre);
-  const t = TIERS[tierOf(c.followers)];
-  const reelsHtml = c.reels.map(r => `
-    <div class="dp-reel">
-      <div class="dp-reel-cover" style="background:${col.bg}">${r.e}</div>
-      <div class="dp-reel-views">${r.v} views</div>
-    </div>`).join('');
-
-  return `
-  <div class="dp-header">
-    <div class="dp-avatar" style="background:${col.bg};color:${col.text}">${c.avatar}</div>
-    <div class="dp-info">
-      <div class="dp-name">${c.name}</div>
-      <div class="dp-handle">${c.handle} &nbsp;·&nbsp;
-        <span style="color:${col.text}">${c.genre}</span> &nbsp;·&nbsp;
-        <span style="background:${t.bg};color:${t.color};padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600">${t.label}</span>
-      </div>
-      <div class="dp-bio">${c.bio}</div>
-    </div>
-    <button onclick="closeDetail()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0">✕ Close</button>
-  </div>
-
-  <div class="dp-stats">
-    <div class="dp-stat">
-      <span class="v">${fmt(c.followers)}</span>
-      <span class="l">Followers</span>
-    </div>
-    <div class="dp-stat">
-      <span class="v">${c.eng}%</span>
-      <span class="l">Engagement rate</span>
-    </div>
-    <div class="dp-stat">
-      <span class="v">${fmt(c.views)}</span>
-      <span class="l">Avg reel views</span>
-    </div>
-    <div class="dp-stat">
-      <span class="v">${c.rate}</span>
-      <span class="l">Rate per post</span>
-    </div>
-  </div>
-
-  <div class="dp-reels-title">Top reels</div>
-  <div class="dp-reels">${reelsHtml}</div>
-
-  <div class="dp-footer">
-    <button class="btn-contact" onclick="alert('In the real platform, this will open a contact form or reveal the creator\\'s email. You can connect this to your backend!')">
-      Contact creator →
-    </button>
-    <button class="btn-save" onclick="alert('Save to shortlist — connect this to Supabase to persist saved creators per brand account!')">
-      ♡ Save
-    </button>
-    <div class="dp-rate">${c.rate} <span>/ post</span></div>
-  </div>`;
-}
-
-// ─── MAIN RENDER ────────────────────────────────────
-function render() {
-  const list = getFiltered();
-  const grid = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  const panel = document.getElementById('detailPanel');
-
-  // Update stats
-  document.getElementById('countDisplay').textContent = list.length;
-  if (list.length) {
-    const avgF = Math.round(list.reduce((a,c)=>a+c.followers,0)/list.length);
-    const avgE = (list.reduce((a,c)=>a+c.eng,0)/list.length).toFixed(1);
-    const total = list.reduce((a,c)=>a+c.followers,0);
-    document.getElementById('statReach').textContent = fmt(avgF);
-    document.getElementById('statEng').textContent = avgE + '%';
-    document.getElementById('statTotal').textContent = fmt(total);
-  }
-
-  // Update hero count
-  document.getElementById('stat-count').textContent = creators.length;
-
-  if (list.length === 0) {
-    grid.innerHTML = '';
-    empty.classList.add('show');
-  } else {
-    empty.classList.remove('show');
-    grid.innerHTML = list.map((c,i) => renderCard(c, i*30)).join('');
-  }
-
-  // Update detail if open
-  if (selectedId) {
-    const still = list.find(c => c.id === selectedId);
-    if (!still) {
-      panel.classList.remove('open');
-      selectedId = null;
-    }
-  }
-}
-
-function openDetail(id) {
-  selectedId = id;
-  const c = creators.find(x => x.id === id);
-  const panel = document.getElementById('detailPanel');
-  panel.innerHTML = renderDetail(c);
-  panel.classList.add('open');
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  render();
-}
-
-function closeDetail() {
-  selectedId = null;
-  document.getElementById('detailPanel').classList.remove('open');
-  render();
-}
-
+// ─── MODAL ──────────────────────────────────────────
 function showModal() {
   document.getElementById("igModal").style.display = "flex";
 }
@@ -1147,52 +942,70 @@ function closeModal() {
 
 function connectInstagram() {
   closeModal();
-
-  // simulate future login
-  alert("Instagram integration will be connected soon. For now switching to verified mode mock.");
-
   isConnected = true;
-  loadCreators();
-}
-// ─── EVENTS ─────────────────────────────────────────
-document.getElementById('genrePills').addEventListener('click', e => {
-  const p = e.target.closest('.pill');
-  if (!p) return;
-  document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
-  p.classList.add('active');
-  activeGenre = p.dataset.genre;
-  closeDetail();
+  alert("Instagram connected (mock mode). Real API comes later.");
   render();
-});
-
-['minF','maxF'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => {
-    document.getElementById('minFVal').textContent = FLEVELS[+document.getElementById('minF').value];
-    document.getElementById('maxFVal').textContent = FLEVELS[+document.getElementById('maxF').value];
-    render();
-  });
-});
-
-document.getElementById('tierSel').addEventListener('change', render);
-document.getElementById('sortSel').addEventListener('change', render);
-
-// ─── INIT ────────────────────────────────────────────
-loadCreators();
-
-if (!localStorage.getItem("ig_popup_seen")) {
-  setTimeout(() => {
-    showModal();
-  }, 1500);
 }
 
-// Animate hero stat counter
-let count = 0;
-const target = creators.length;
-const counter = setInterval(() => {
-  count = Math.min(count + 1, target);
-  document.getElementById('stat-count').textContent = count;
-  if (count >= target) clearInterval(counter);
-}, 60);
+// ─── FILTER ─────────────────────────────────────────
+function getFiltered() {
+  return creators.filter(c => {
+    if (activeGenre !== 'all' && c.genre !== activeGenre) return false;
+    return true;
+  });
+}
+
+// ─── RENDER CARD ────────────────────────────────────
+function renderCard(c) {
+  const col = getColor(c.genre);
+
+  return `
+  <div class="creator-card"
+       onclick="openDetail(${c.id})">
+    <div class="card-cover" style="background:${col.bg}">
+      <span>${c.icon}</span>
+    </div>
+    <div class="card-body">
+      <div class="card-avatar" style="background:${col.bg};color:${col.text}">${c.avatar}</div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-handle">${c.handle}</div>
+      <div class="card-genre">${c.genre}</div>
+      <div class="card-meta">
+        <div>${fmt(c.followers)} followers</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── DETAIL ─────────────────────────────────────────
+function openDetail(id) {
+  const c = creators.find(x => x.id === id);
+  document.getElementById('detailPanel').innerHTML = `
+    <h2>${c.name}</h2>
+    <p>${c.bio}</p>
+    <p><b>${c.rate}</b></p>
+  `;
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+// ─── RENDER ─────────────────────────────────────────
+function render() {
+  const list = getFiltered();
+  document.getElementById('grid').innerHTML = list.map(renderCard).join('');
+  document.getElementById('stat-count').textContent = creators.length;
+  document.getElementById('countDisplay').textContent = list.length;
+}
+
+// ─── INIT ───────────────────────────────────────────
+function init() {
+  render();
+
+  if (!localStorage.getItem("ig_popup_seen")) {
+    setTimeout(showModal, 1500);
+  }
+}
+
+init();
 </script>
 <div id="igModal" class="ig-modal">
   <div class="ig-modal-content">
