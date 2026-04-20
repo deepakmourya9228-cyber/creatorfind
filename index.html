@@ -737,6 +737,43 @@
     .filter-bottom { flex-direction: column; }
     .filter-group { min-width: 100%; }
   }
+  /* ── Add CSS for modal ── */
+  .ig-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.ig-modal-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 28px;
+  border-radius: 16px;
+  max-width: 420px;
+  text-align: center;
+}
+
+.ig-modal-content h2 {
+  font-family: 'Syne', sans-serif;
+  margin-bottom: 10px;
+}
+
+.ig-modal-content p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.ig-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
 </style>
 </head>
 <body>
@@ -1099,6 +1136,24 @@ function closeDetail() {
   render();
 }
 
+function showModal() {
+  document.getElementById("igModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("igModal").style.display = "none";
+  localStorage.setItem("ig_popup_seen", "true");
+}
+
+function connectInstagram() {
+  closeModal();
+
+  // simulate future login
+  alert("Instagram integration will be connected soon. For now switching to verified mode mock.");
+
+  isConnected = true;
+  loadCreators();
+}
 // ─── EVENTS ─────────────────────────────────────────
 document.getElementById('genrePills').addEventListener('click', e => {
   const p = e.target.closest('.pill');
@@ -1123,6 +1178,12 @@ document.getElementById('sortSel').addEventListener('change', render);
 
 // ─── INIT ────────────────────────────────────────────
 loadCreators();
+
+if (!localStorage.getItem("ig_popup_seen")) {
+  setTimeout(() => {
+    showModal();
+  }, 1500);
+}
 
 // Animate hero stat counter
 let count = 0;
@@ -1149,7 +1210,6 @@ const counter = setInterval(() => {
         Maybe later
       </button>
     </div>
-
     <small>We never post without your permission.</small>
   </div>
 </div>
