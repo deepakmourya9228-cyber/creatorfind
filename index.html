@@ -933,6 +933,14 @@ function getColor(genre) {
   return COLORS[genre] || { bg:'rgba(122,122,144,0.15)', text:'#7a7a90', tile:'rgba(122,122,144,0.2)' };
 }
 
+function fakeConnect(btn) {
+  btn.innerText = "Connecting...";
+  
+  setTimeout(() => {
+    btn.innerText = "Connected ✓";
+    btn.style.background = "#2dd4bf";
+  }, 1200);
+}
 // ─── FILTER ─────────────────────────────────────────
 function getFiltered() {
   const minF = FVALUES[+document.getElementById('minF').value];
