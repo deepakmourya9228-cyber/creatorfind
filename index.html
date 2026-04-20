@@ -1133,5 +1133,25 @@ const counter = setInterval(() => {
   if (count >= target) clearInterval(counter);
 }, 60);
 </script>
+<div id="igModal" class="ig-modal">
+  <div class="ig-modal-content">
+    <h2>🔗 Connect Instagram</h2>
+    <p>
+      Connect your Instagram to unlock real-time creator insights like verified followers,
+      engagement rate, and live reel analytics.
+    </p>
+
+    <div class="ig-actions">
+      <button onclick="connectInstagram()" class="btn-accent">
+        Connect Instagram
+      </button>
+      <button onclick="closeModal()" class="btn-ghost">
+        Maybe later
+      </button>
+    </div>
+
+    <small>We never post without your permission.</small>
+  </div>
+</div>
 </body>
 </html>
