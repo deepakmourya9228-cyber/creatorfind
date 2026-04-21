@@ -1,209 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CreatorFind — India's Influencer Discovery Platform</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreatorFind — India's Influencer Discovery Platform</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-<style>
-/* KEEP YOUR ORIGINAL CSS EXACTLY — trimmed here for space */
-/* IMPORTANT: your existing CSS already works */
+    <style>
+        :root {
+            --accent: #c8f135;
+            --bg: #0a0a0f;
+            --card-bg: #13131a;
+            --text: #ffffff;
+            --border: rgba(255,255,255,0.1);
+        }
 
-body {
-  background:#0a0a0f;
-  color:#fff;
-  font-family:'DM Sans', sans-serif;
-}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-/* modal (already had, keeping safe) */
-.ig-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+        /* Navbar */
+        nav {
+            padding: 24px 40px;
+            display: flex;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+        }
 
-.ig-modal-content {
-  background: #13131a;
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 28px;
-  border-radius: 16px;
-  width: 400px;
-}
+        /* Grid System */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 40px;
+        }
 
-.btn-accent {
-  background:#c8f135;
-  border:none;
-  padding:10px 16px;
-  cursor:pointer;
-}
+        .creator-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.2s ease;
+        }
 
-.btn-ghost {
-  background:transparent;
-  border:1px solid #555;
-  padding:10px 16px;
-  cursor:pointer;
-}
-</style>
+        .creator-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .creator-card h3 {
+            margin: 0 0 4px 0;
+            font-family: 'Syne', sans-serif;
+            color: var(--accent);
+        }
+
+        .creator-card .handle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        /* Modal Styling */
+        .ig-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .ig-modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 32px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Buttons */
+        .btn-accent {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 700;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Form Controls */
+        input, textarea {
+            width: 100%;
+            background: #1a1a24;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        h2 { font-family: 'Syne', sans-serif; margin-top: 0; }
+    </style>
 </head>
-
 <body>
 
-<!-- NAV -->
-<div style="padding:20px;">
-  <button class="btn-ghost">List your profile</button>
-  <button class="btn-accent">I'm a brand</button>
-</div>
+<nav>
+    <button class="btn-ghost" onclick="openCreatorFlow()">List your profile</button>
+    <button class="btn-accent" onclick="openBrandFlow()">I'm a brand</button>
+</nav>
 
-<!-- GRID -->
-<div id="grid" style="padding:20px;"></div>
+<div id="grid">
+    </div>
 
-<!-- ✅ FIXED MODAL -->
 <div class="ig-modal" id="igModal">
-  <div class="ig-modal-content" id="modalBox"></div>
+    <div class="ig-modal-content" id="modalBox"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// SUPABASE
-const supabaseUrl = "https://ybrwjudaxuxoksyocbvn.supabase.co";
-const supabaseKey = "YOUR_KEY"; // ⚠️ REPLACE
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    // 1. SUPABASE CONFIG
+    const supabaseUrl = "https://ybrwjudaxuxoksyocbvn.supabase.co";
+    const supabaseKey = "YOUR_KEY"; // ⚠️ REPLACE WITH YOUR ACTUAL KEY
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-// DATA
-let creators = [];
+    let creators = [];
 
-// LOAD DATA
-async function loadCreators() {
-  const { data } = await supabaseClient.from("creators").select("*");
-  creators = data || [];
-  render();
-}
+    // 2. LOAD DATA FROM DATABASE
+    async function loadCreators() {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = `<p style="color:#888;">Loading the best talent...</p>`;
 
-// RENDER GRID
-function render() {
-  document.getElementById("grid").innerHTML =
-    creators.map(c => `<div>${c.name} (${c.handle})</div>`).join("");
-}
+        const { data, error } = await supabaseClient
+            .from("creators")
+            .select("*")
+            .order('created_at', { ascending: false });
 
-// BUTTON INIT (FIXED)
-function initButtons() {
-  const creatorBtn = document.querySelector(".btn-ghost");
-  const brandBtn = document.querySelectorAll(".btn-accent")[0];
+        if (error) {
+            grid.innerHTML = `<p style="color:red;">Error fetching creators. Check your Supabase Key.</p>`;
+            return;
+        }
 
-  creatorBtn.onclick = openCreatorFlow;
-  brandBtn.onclick = openBrandFlow;
-}
+        creators = data || [];
+        render();
+    }
 
-// FLOWS
-function openBrandFlow() {
-  showModal(
-    "Welcome, Brand 🚀",
-    "Browse creators and connect instantly.",
-    "Start exploring",
-    closeModal
-  );
-}
+    // 3. RENDER GRID
+    function render() {
+        const grid = document.getElementById("grid");
+        if (creators.length === 0) {
+            grid.innerHTML = `<p>No creators listed yet. Be the first!</p>`;
+            return;
+        }
 
-function openCreatorFlow() {
-  showModal(
-    "Join as Creator ✨",
-    "List your profile to get brand deals.",
-    "Add Profile",
-    goToCreatorForm
-  );
-}
+        grid.innerHTML = creators.map(c => `
+            <div class="creator-card">
+                <h3>${c.name}</h3>
+                <div class="handle">@${c.handle.replace('@', '')}</div>
+                <div style="margin-bottom: 10px;">
+                    <span style="color:var(--accent); font-weight:bold;">${Number(c.followers).toLocaleString()}</span> 
+                    <span style="font-size:0.8rem; opacity:0.7;">FOLLOWERS</span>
+                </div>
+                <p style="font-size:0.9rem; color:#ccc; min-height:40px;">${c.bio || 'No bio provided.'}</p>
+                <div style="border-top: 1px solid #222; padding-top:15px; font-weight:bold;">
+                    Rate: ${c.rate || 'Inquire'}
+                </div>
+            </div>
+        `).join("");
+    }
 
-// FORM HTML
-function getFormHTML() {
-  return `
-    <h2>✨ List Your Profile</h2>
-    <p>Fill this to get discovered by brands.</p>
+    // 4. FLOWS & MODAL LOGIC
+    function openBrandFlow() {
+        showModal(
+            "Welcome, Brand 🚀",
+            "Browse through India's top influencers and connect with them for your next campaign.",
+            "Start Exploring",
+            closeModal
+        );
+    }
 
-    <form onsubmit="submitCreator(event)">
-      <input id="name" placeholder="Name" required><br><br>
-      <input id="handle" placeholder="Instagram handle" required><br><br>
-      <input id="followers" type="number" placeholder="Followers" required><br><br>
-      <input id="bio" placeholder="Bio"><br><br>
-      <input id="rate" placeholder="Rate"><br><br>
+    function openCreatorFlow() {
+        showModal(
+            "Join as Creator ✨",
+            "Fill out your details to get listed and start receiving collaboration requests from brands.",
+            "Add My Profile",
+            goToCreatorForm
+        );
+    }
 
-      <button class="btn-accent">Submit</button>
-      <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
-    </form>
-  `;
-}
+    function goToCreatorForm() {
+        const box = document.getElementById("modalBox");
+        box.innerHTML = `
+            <h2>✨ List Profile</h2>
+            <form id="creatorForm">
+                <input type="text" id="ins_name" placeholder="Full Name" required>
+                <input type="text" id="ins_handle" placeholder="Instagram Handle (e.g. @username)" required>
+                <input type="number" id="ins_followers" placeholder="Follower Count" required>
+                <input type="text" id="ins_rate" placeholder="Base Rate (e.g. ₹10,000 / post)">
+                <textarea id="ins_bio" placeholder="Briefly describe your niche..." rows="3"></textarea>
+                
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="submit" class="btn-accent" style="flex:1;">Submit</button>
+                    <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        `;
 
-// OPEN FORM (FIXED)
-function goToCreatorForm() {
-  const modal = document.getElementById("igModal");
-  const box = document.getElementById("modalBox");
+        document.getElementById("creatorForm").onsubmit = submitCreator;
+    }
 
-  box.innerHTML = getFormHTML();
-  modal.style.display = "flex";
-}
+    async function submitCreator(e) {
+        e.preventDefault();
+        
+        // Grab values securely
+        const data = {
+            name: document.getElementById("ins_name").value,
+            handle: document.getElementById("ins_handle").value,
+            followers: parseInt(document.getElementById("ins_followers").value),
+            bio: document.getElementById("ins_bio").value,
+            rate: document.getElementById("ins_rate").value
+        };
 
-// SUBMIT
-async function submitCreator(e) {
-  e.preventDefault();
+        const { error } = await supabaseClient
+            .from("creators")
+            .insert([data]);
 
-  const data = {
-    name: name.value,
-    handle: handle.value,
-    followers: parseInt(followers.value),
-    bio: bio.value,
-    rate: rate.value
-  };
+        if (error) {
+            alert("Error: " + error.message);
+            return;
+        }
 
-  const { error } = await supabaseClient
-    .from("creators")
-    .insert([data]);
+        // Success State
+        document.getElementById("modalBox").innerHTML = `
+            <div style="text-align:center;">
+                <h2 style="font-size:3rem;">🎉</h2>
+                <h2>You're Listed!</h2>
+                <p>Your profile is now live for brands to see.</p>
+                <button class="btn-accent" onclick="closeModal()">Awesome!</button>
+            </div>
+        `;
 
-  if (error) {
-    alert("Error saving profile");
-    return;
-  }
+        loadCreators();
+    }
 
-  // SUCCESS UI
-  document.getElementById("modalBox").innerHTML = `
-    <h2>🎉 Profile Submitted!</h2>
-    <p>Your profile is live.</p>
-    <button class="btn-accent" onclick="closeModal()">Awesome 🚀</button>
-  `;
+    function showModal(title, text, actionText, actionFn) {
+        const modal = document.getElementById("igModal");
+        const box = document.getElementById("modalBox");
 
-  loadCreators();
-}
+        box.innerHTML = `
+            <h2>${title}</h2>
+            <p style="color:#aaa; line-height:1.6; margin-bottom:24px;">${text}</p>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-accent" id="modalActionBtn">${actionText}</button>
+                <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+            </div>
+        `;
 
-// MODAL SYSTEM (FIXED)
-function showModal(title, text, actionText, actionFn) {
-  const modal = document.getElementById("igModal");
-  const box = document.getElementById("modalBox");
+        document.getElementById("modalActionBtn").onclick = actionFn;
+        modal.style.display = "flex";
+    }
 
-  box.innerHTML = `
-    <h2>${title}</h2>
-    <p>${text}</p>
-    <button class="btn-accent">${actionText}</button>
-    <button class="btn-ghost" onclick="closeModal()">Cancel</button>
-  `;
+    function closeModal() {
+        document.getElementById("igModal").style.display = "none";
+    }
 
-  box.querySelector(".btn-accent").onclick = actionFn;
-  modal.style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("igModal").style.display = "none";
-}
-
-// INIT
-document.addEventListener("DOMContentLoaded", () => {
-  initButtons();
-  loadCreators();
-});
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCreators();
+    });
 </script>
 
 </body>
