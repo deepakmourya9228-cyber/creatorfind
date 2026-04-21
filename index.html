@@ -3,12 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CreatorFind</title>
+<title>CreatorFind — India's Influencer Discovery Platform</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-/* KEEP YOUR EXISTING CSS — unchanged */
+/* KEEP YOUR ORIGINAL CSS EXACTLY — trimmed here for space */
+/* IMPORTANT: your existing CSS already works */
 
-/* ADD THIS (modal already in your CSS but keeping safe) */
+body {
+  background:#0a0a0f;
+  color:#fff;
+  font-family:'DM Sans', sans-serif;
+}
+
+/* modal (already had, keeping safe) */
 .ig-modal {
   position: fixed;
   inset: 0;
@@ -18,19 +27,43 @@
   justify-content: center;
   z-index: 9999;
 }
+
+.ig-modal-content {
+  background: #13131a;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 28px;
+  border-radius: 16px;
+  width: 400px;
+}
+
+.btn-accent {
+  background:#c8f135;
+  border:none;
+  padding:10px 16px;
+  cursor:pointer;
+}
+
+.btn-ghost {
+  background:transparent;
+  border:1px solid #555;
+  padding:10px 16px;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <!-- NAV -->
-<button class="btn-ghost">List your profile</button>
-<button class="btn-accent">I'm a brand</button>
+<div style="padding:20px;">
+  <button class="btn-ghost">List your profile</button>
+  <button class="btn-accent">I'm a brand</button>
+</div>
 
 <!-- GRID -->
-<div id="grid"></div>
+<div id="grid" style="padding:20px;"></div>
 
-<!-- ✅ MODAL -->
+<!-- ✅ FIXED MODAL -->
 <div class="ig-modal" id="igModal">
   <div class="ig-modal-content" id="modalBox"></div>
 </div>
@@ -38,28 +71,28 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ✅ SUPABASE
+// SUPABASE
 const supabaseUrl = "https://ybrwjudaxuxoksyocbvn.supabase.co";
-const supabaseKey = "YOUR_KEY"; // ⚠️ PUT REAL KEY
+const supabaseKey = "YOUR_KEY"; // ⚠️ REPLACE
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 // DATA
 let creators = [];
 
-// LOAD
+// LOAD DATA
 async function loadCreators() {
   const { data } = await supabaseClient.from("creators").select("*");
   creators = data || [];
   render();
 }
 
-// RENDER
+// RENDER GRID
 function render() {
   document.getElementById("grid").innerHTML =
-    creators.map(c => `<div>${c.name} - ${c.handle}</div>`).join("");
+    creators.map(c => `<div>${c.name} (${c.handle})</div>`).join("");
 }
 
-// BUTTONS
+// BUTTON INIT (FIXED)
 function initButtons() {
   const creatorBtn = document.querySelector(".btn-ghost");
   const brandBtn = document.querySelectorAll(".btn-accent")[0];
@@ -70,16 +103,16 @@ function initButtons() {
 
 // FLOWS
 function openBrandFlow() {
-  showCustomModal(
+  showModal(
     "Welcome, Brand 🚀",
-    "Browse and contact creators.",
+    "Browse creators and connect instantly.",
     "Start exploring",
     closeModal
   );
 }
 
 function openCreatorFlow() {
-  showCustomModal(
+  showModal(
     "Join as Creator ✨",
     "List your profile to get brand deals.",
     "Add Profile",
@@ -87,26 +120,26 @@ function openCreatorFlow() {
   );
 }
 
-// ✅ FORM HTML
+// FORM HTML
 function getFormHTML() {
   return `
     <h2>✨ List Your Profile</h2>
     <p>Fill this to get discovered by brands.</p>
 
     <form onsubmit="submitCreator(event)">
-      <input placeholder="Name" id="name" required><br><br>
-      <input placeholder="Instagram handle" id="handle" required><br><br>
-      <input placeholder="Followers" id="followers" type="number" required><br><br>
-      <input placeholder="Bio" id="bio"><br><br>
-      <input placeholder="Rate" id="rate"><br><br>
+      <input id="name" placeholder="Name" required><br><br>
+      <input id="handle" placeholder="Instagram handle" required><br><br>
+      <input id="followers" type="number" placeholder="Followers" required><br><br>
+      <input id="bio" placeholder="Bio"><br><br>
+      <input id="rate" placeholder="Rate"><br><br>
 
-      <button class="btn-accent" type="submit">Submit</button>
-      <button type="button" onclick="closeModal()">Cancel</button>
+      <button class="btn-accent">Submit</button>
+      <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
     </form>
   `;
 }
 
-// OPEN FORM
+// OPEN FORM (FIXED)
 function goToCreatorForm() {
   const modal = document.getElementById("igModal");
   const box = document.getElementById("modalBox");
@@ -132,21 +165,22 @@ async function submitCreator(e) {
     .insert([data]);
 
   if (error) {
-    alert("Error saving");
+    alert("Error saving profile");
     return;
   }
 
   // SUCCESS UI
   document.getElementById("modalBox").innerHTML = `
     <h2>🎉 Profile Submitted!</h2>
-    <button onclick="closeModal()">Close</button>
+    <p>Your profile is live.</p>
+    <button class="btn-accent" onclick="closeModal()">Awesome 🚀</button>
   `;
 
   loadCreators();
 }
 
-// MODAL
-function showCustomModal(title, text, actionText, actionFn) {
+// MODAL SYSTEM (FIXED)
+function showModal(title, text, actionText, actionFn) {
   const modal = document.getElementById("igModal");
   const box = document.getElementById("modalBox");
 
@@ -154,7 +188,7 @@ function showCustomModal(title, text, actionText, actionFn) {
     <h2>${title}</h2>
     <p>${text}</p>
     <button class="btn-accent">${actionText}</button>
-    <button onclick="closeModal()">Cancel</button>
+    <button class="btn-ghost" onclick="closeModal()">Cancel</button>
   `;
 
   box.querySelector(".btn-accent").onclick = actionFn;
