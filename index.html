@@ -3,283 +3,1167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CreatorFind — 3D Discovery Platform</title>
+<title>CreatorFind — India's Influencer Discovery Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050508;
-    --surface: rgba(25, 25, 35, 0.7);
-    --surface-solid: #13131a;
-    --border: rgba(255,255,255,0.1);
-    --accent: #c8f135;
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
     --text: #f0f0f5;
-    --muted: #8a8a9a;
+    --muted: #7a7a90;
+    --accent: #c8f135;
+    --accent-dark: #a8d015;
+    --accent-glow: rgba(200,241,53,0.12);
+    --pink: #ff5fa0;
+    --blue: #5fb4ff;
+    --orange: #ff8c42;
+    --purple: #a855f7;
+    --teal: #2dd4bf;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body { 
-    background: var(--bg); 
-    color: var(--text); 
-    font-family: 'DM Sans', sans-serif; 
-    perspective: 1200px; /* Essential for 3D */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* Animated 3D Background */
-  .grid-bg {
-    position: fixed; inset: 0;
-    background-image: 
-      linear-gradient(rgba(200, 241, 53, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(200, 241, 53, 0.05) 1px, transparent 1px);
-    background-size: 60px 60px;
-    transform: rotateX(60deg) translateY(-200px);
-    z-index: -1;
-    animation: gridMove 20s linear infinite;
+  /* BG grid pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
   }
-  @keyframes gridMove { from { background-position: 0 0; } to { background-position: 0 1000px; } }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
+  /* HERO glow */
+  .hero-glow {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(200,241,53,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-  /* --- NAV --- */
-  nav { 
-    position: sticky; top: 0; z-index: 1000;
-    background: rgba(5, 5, 8, 0.8);
-    backdrop-filter: blur(12px);
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
     border-bottom: 1px solid var(--border);
-    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    z-index: 100;
   }
-  .nav-inner { display: flex; justify-content: space-between; align-items: center; }
-  .logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; text-decoration: none; color: white; }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    text-decoration: none;
+  }
+
   .logo span { color: var(--accent); }
-  .btn-accent { 
-    background: var(--accent); color: black; border: none; 
-    padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(200, 241, 53, 0.3); transition: 0.3s;
-  }
-  .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(200, 241, 53, 0.5); }
 
-  /* --- HERO (Spatial Layer) --- */
-  .hero { 
-    padding: 100px 0 60px; text-align: center; 
-    transform-style: preserve-3d;
-  }
-  .hero h1 { 
-    font-family: 'Syne', sans-serif; font-size: 72px; line-height: 1; margin-bottom: 24px;
-    transform: translateZ(50px); /* Pushes text forward */
+  .nav-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 
-  /* --- 3D CARDS --- */
-  .creators-grid { 
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 30px; padding-bottom: 100px;
+  .btn-ghost {
+    padding: 8px 18px;
+    border: 1px solid var(--border-hover);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
   }
-  
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface); }
+
+  .btn-accent {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #0a0a0f;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid rgba(200,241,53,0.3);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+    background: rgba(200,241,53,0.06);
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 7vw, 80px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 36px;
+    font-weight: 300;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .hero-stat { text-align: center; }
+  .hero-stat .val {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+  .hero-stat .lbl { font-size: 13px; color: var(--muted); }
+
+  /* ── FILTER BAR ── */
+  .filter-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+
+  .filter-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .genre-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0a0a0f;
+    font-weight: 500;
+  }
+
+  .filter-bottom {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; }
+  .filter-group label { font-size: 12px; color: var(--muted); }
+
+  .filter-group select {
+    padding: 9px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+    transition: border-color 0.2s;
+  }
+  .filter-group select:focus { border-color: var(--accent); }
+
+  .range-wrap { display: flex; align-items: center; gap: 10px; }
+  .range-wrap input[type=range] {
+    flex: 1;
+    height: 4px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    background: var(--surface2);
+    border-radius: 4px;
+    outline: none;
+    border: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .range-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+  .range-val {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    min-width: 54px;
+    text-align: right;
+  }
+
+  /* ── RESULTS BAR ── */
+  .results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .results-count {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .results-count span { color: var(--accent); }
+
+  .summary-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .summary-pill {
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .summary-pill strong { color: var(--text); }
+
+  /* ── GRID ── */
+  .creators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  /* ── CREATOR CARD ── */
   .creator-card {
     background: var(--surface);
-    backdrop-filter: blur(10px);
     border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 24px;
-    transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-    transform-style: preserve-3d;
+    border-radius: 16px;
+    overflow: hidden;
     cursor: pointer;
+    transition: all 0.22s;
     position: relative;
   }
 
   .creator-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  }
+
+  .creator-card.selected {
     border-color: var(--accent);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 0 0 1px var(--accent), 0 16px 40px rgba(200,241,53,0.12);
   }
 
-  .card-content { transform: translateZ(30px); } /* UI floats above card */
-
-  .avatar {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: var(--accent); color: black;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-family: 'Syne'; margin-bottom: 16px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  .card-cover {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    position: relative;
+    overflow: hidden;
   }
 
-  /* --- FILTERS --- */
-  .filter-section {
-    background: rgba(255,255,255,0.03);
+  .card-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, var(--surface) 100%);
+  }
+
+  .card-body { padding: 0 16px 16px; }
+
+  .card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    border: 2px solid var(--surface);
+    margin-top: -24px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .card-handle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .card-genre {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card-reels {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .reel-chip {
+    flex: 1;
+    height: 52px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 18px;
+    position: relative;
+    overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 32px; margin-bottom: 40px;
-    backdrop-filter: blur(20px);
   }
 
-  .pill {
-    padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border);
-    background: transparent; color: var(--muted); cursor: pointer; transition: 0.2s;
+  .reel-chip .reel-views {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.03em;
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    text-align: center;
   }
-  .pill.active { background: var(--accent); color: black; border-color: var(--accent); }
 
-  /* --- DETAIL PANEL (Layered) --- */
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .meta-item { text-align: center; }
+  .meta-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+  .meta-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .tier-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+
+  /* ── DETAIL PANEL ── */
   .detail-panel {
-    position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 800px; height: 80vh;
-    background: var(--surface-solid);
-    border: 1px solid var(--accent);
-    border-radius: 32px; z-index: 2000;
-    display: none; padding: 40px;
-    box-shadow: 0 0 100px rgba(0,0,0,0.8);
-    overflow-y: auto;
-  }
-  .detail-panel.open { display: block; animation: panelIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  @keyframes panelIn { from { opacity: 0; transform: translateX(-50%) translateZ(-100px); } }
-
-  .btn-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; font-size: 24px; }
-
-  /* Modal Overlays for all buttons */
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    display: none; align-items: center; justify-content: center; z-index: 3000;
-  }
-  .modal-box { 
-    background: var(--surface-solid); border: 1px solid var(--border);
-    padding: 40px; border-radius: 24px; max-width: 400px; width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 40px;
+    display: none;
+    animation: slideUp 0.25s ease;
   }
 
-  input, select, textarea {
-    width: 100%; padding: 12px; background: #0a0a0f; border: 1px solid var(--border);
-    border-radius: 10px; color: white; margin-top: 8px; margin-bottom: 20px;
+  .detail-panel.open { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
+  .dp-header {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .dp-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .dp-info { flex: 1; }
+
+  .dp-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .dp-handle { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .dp-bio { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 540px; }
+
+  .dp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .dp-stat {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .dp-stat .v {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .dp-stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .dp-reels-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .dp-reels {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 28px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .dp-reel {
+    flex-shrink: 0;
+    width: 100px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.2s;
+    cursor: pointer;
+  }
+
+  .dp-reel:hover { border-color: var(--border-hover); }
+
+  .dp-reel-cover {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+  }
+
+  .dp-reel-views {
+    padding: 6px 8px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .dp-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-contact {
+    padding: 12px 28px;
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+  .btn-contact:hover { background: var(--accent-dark); transform: translateY(-1px); }
+
+  .btn-save {
+    padding: 12px 20px;
+    border: 1px solid var(--border-hover);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { color: var(--text); border-color: var(--text); }
+
+  .dp-rate {
+    margin-left: auto;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .dp-rate span { font-size: 12px; color: var(--muted); font-family: 'DM Sans'; font-weight: 400; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    display: none;
+  }
+
+  .empty.show { display: block; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty h3 { font-family: 'Syne', sans-serif; font-size: 20px; color: var(--text); margin-bottom: 8px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+
+  /* ── ANIMATIONS ── */
+  .creator-card {
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .container { padding: 0 16px; }
+    .nav-inner { padding: 0 16px; }
+    .hero h1 { font-size: 38px; letter-spacing: -1px; }
+    .hero-stats { gap: 20px; }
+    .dp-stats { grid-template-columns: repeat(2, 1fr); }
+    .filter-bottom { flex-direction: column; }
+    .filter-group { min-width: 100%; }
+  }
+  /* ── Add CSS for modal ── */
+  .ig-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.ig-modal-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 28px;
+  border-radius: 16px;
+  max-width: 420px;
+  text-align: center;
+}
+
+.ig-modal-content h2 {
+  font-family: 'Syne', sans-serif;
+  margin-bottom: 10px;
+}
+
+.ig-modal-content p {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.ig-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
 </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
+<div class="hero-glow"></div>
 
+<!-- NAV -->
 <nav>
-  <div class="container nav-inner">
-    <a href="#" class="logo">creator<span>find</span></a>
-    <div style="display: flex; gap: 12px;">
-        <button class="pill" onclick="openModal('creatorModal')">List Profile</button>
-        <button class="btn-accent" onclick="openModal('brandModal')">I'm a Brand</button>
+  <div class="nav-inner">
+    <a class="logo" href="#">creator<span>find</span></a>
+    <div class="nav-actions">
+      <button class="btn-ghost">List your profile</button>
+      <button class="btn-accent">I'm a brand</button>
+      <button class="btn-accent" onclick="fakeConnect(this)">
+  Connect Instagram
+</button>
     </div>
   </div>
 </nav>
 
+<!-- HERO -->
 <div class="container">
   <section class="hero">
-    <h1>Discover the<br><span style="color:var(--accent)">Spatial Creator</span> Economy</h1>
-    <p style="color:var(--muted); font-size: 18px; max-width: 600px; margin: 0 auto;">Experience influencer discovery in 3D. Filter by niche, reach, and engagement.</p>
+    <div class="hero-eyebrow">India's #1 Creator Discovery Platform</div>
+    <h1>Find the perfect<em>ad creator.</em></h1>
+    <p>Discover authentic Indian creators across every niche. Filter by genre, audience size, and engagement — then connect instantly.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="val" id="stat-count">0</span>
+        <span class="lbl">Creators listed</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">12+</span>
+        <span class="lbl">Genres covered</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">500+</span>
+        <span class="lbl">Brands connected</span>
+      </div>
+      <div class="hero-stat">
+        <span class="val">₹0</span>
+        <span class="lbl">Platform fee</span>
+      </div>
+    </div>
   </section>
 
+  <!-- FILTERS -->
   <section class="filter-section">
-    <div id="genrePills" style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="filter-top">
+      <span class="filter-label">Genre</span>
+      <div class="genre-pills" id="genrePills">
         <button class="pill active" data-genre="all">All</button>
-        <button class="pill" data-genre="fashion">Fashion</button>
-        <button class="pill" data-genre="tech">Tech</button>
-        <button class="pill" data-genre="fitness">Fitness</button>
-        <button class="pill" data-genre="food">Food</button>
+        <button class="pill" data-genre="fashion">👗 Fashion</button>
+        <button class="pill" data-genre="fitness">💪 Fitness</button>
+        <button class="pill" data-genre="food">🍜 Food</button>
+        <button class="pill" data-genre="tech">📱 Tech</button>
+        <button class="pill" data-genre="travel">✈️ Travel</button>
+        <button class="pill" data-genre="beauty">💄 Beauty</button>
+        <button class="pill" data-genre="finance">📊 Finance</button>
+        <button class="pill" data-genre="gaming">🎮 Gaming</button>
+        <button class="pill" data-genre="lifestyle">🌟 Lifestyle</button>
+        <button class="pill" data-genre="comedy">😂 Comedy</button>
+      </div>
+    </div>
+
+    <div class="filter-bottom">
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Min followers</label>
+        <div class="range-wrap">
+          <input type="range" id="minF" min="0" max="10" value="0" step="1">
+          <span class="range-val" id="minFVal">Any</span>
+        </div>
+      </div>
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Max followers</label>
+        <div class="range-wrap">
+          <input type="range" id="maxF" min="0" max="10" value="10" step="1">
+          <span class="range-val" id="maxFVal">10M+</span>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Creator tier</label>
+        <select id="tierSel">
+          <option value="all">All tiers</option>
+          <option value="nano">Nano (1k–10k)</option>
+          <option value="micro">Micro (10k–100k)</option>
+          <option value="macro">Macro (100k–1M)</option>
+          <option value="mega">Mega (1M+)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Sort by</label>
+        <select id="sortSel">
+          <option value="followers">Most followers</option>
+          <option value="engagement">Best engagement</option>
+          <option value="views">Most reel views</option>
+        </select>
+      </div>
     </div>
   </section>
 
-  <div class="creators-grid" id="grid">
+  <!-- RESULTS BAR -->
+  <div class="results-bar">
+    <div class="results-count">Showing <span id="countDisplay">0</span> creators</div>
+    <div class="summary-pills">
+      <div class="summary-pill">Avg reach: <strong id="statReach">—</strong></div>
+      <div class="summary-pill">Avg engagement: <strong id="statEng">—</strong></div>
+      <div class="summary-pill">Total audience: <strong id="statTotal">—</strong></div>
     </div>
+  </div>
+
+  <!-- CREATOR DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel"></div>
+
+  <!-- GRID -->
+  <div class="creators-grid" id="grid"></div>
+  <div class="empty" id="empty">
+    <div class="empty-icon">🔍</div>
+    <h3>No creators found</h3>
+    <p>Try broadening your filters to see more creators.</p>
+  </div>
 </div>
 
-<div class="detail-panel" id="detailPanel">
-    <button class="btn-close" onclick="closeDetail()">✕</button>
-    <div id="panelContent"></div>
-</div>
+<!-- FOOTER -->
+<footer>
+  <div>Built with ♥ in India &nbsp;·&nbsp; <a href="#">Add your profile</a> &nbsp;·&nbsp; <a href="#">For brands</a> &nbsp;·&nbsp; <a href="#">Contact</a></div>
+  <div style="margin-top:6px;font-size:12px">© 2025 CreatorFind. All data is curated manually.</div>
+</footer>
 
-<div class="overlay" id="creatorModal">
-    <div class="modal-box">
-        <h2 style="margin-bottom: 20px;">List your Profile</h2>
-        <input type="text" placeholder="Full Name">
-        <input type="text" placeholder="Instagram Handle">
-        <select>
-            <option>Fashion</option>
-            <option>Tech</option>
-        </select>
-        <button class="btn-accent" style="width: 100%;" onclick="closeModal('creatorModal')">Submit →</button>
-    </div>
-</div>
-
-<div class="overlay" id="brandModal">
-    <div class="modal-box">
-        <h2 style="margin-bottom: 20px;">For Brands</h2>
-        <p style="color:var(--muted); margin-bottom: 20px;">Connect with top-tier Indian creators instantly.</p>
-        <input type="email" placeholder="Work Email">
-        <button class="btn-accent" style="width: 100%;" onclick="closeModal('brandModal')">Get Access</button>
-    </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const creators = [
-  {id:1, name:"Priya Sharma", handle:"@priyastyled", genre:"fashion", followers:"820K", eng:"4.2%", avatar:"PS", bio:"Fashion & lifestyle creator from Mumbai."},
-  {id:2, name:"Arjun Fitness", handle:"@arjunfit", genre:"fitness", followers:"340K", eng:"6.8%", avatar:"AF", bio:"Certified trainer and nutrition expert."},
-  {id:3, name:"TechWala Raj", handle:"@techwalaraj", genre:"tech", followers:"280K", eng:"7.3%", avatar:"TR", bio:"Hindi tech reviews and unboxing."},
-  {id:4, name:"Riya Eats", handle:"@riyaeats", genre:"food", followers:"1.2M", eng:"5.1%", avatar:"RE", bio:"Street food and recipe explorer."}
-];
+async function submitCreator(e) {
+  e.preventDefault();
 
-function render() {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = creators.map(c => `
-        <div class="creator-card" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)" onclick="openDetail(${c.id})">
-            <div class="card-content">
-                <div class="avatar">${c.avatar}</div>
-                <h3>${c.name}</h3>
-                <p style="color:var(--muted); font-size: 14px;">${c.handle}</p>
-                <div style="margin-top: 15px; display: flex; justify-content: space-between;">
-                    <span><b>${c.followers}</b></span>
-                    <span style="color:var(--accent)">${c.eng}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
+  const creator = {
+    name: document.getElementById("name").value,
+    handle: document.getElementById("handle").value,
+    genre: document.getElementById("genre").value,
+    followers: parseInt(document.getElementById("followers").value),
+    bio: document.getElementById("bio").value,
+    rate: document.getElementById("rate").value,
+    avatar: document.getElementById("name").value.charAt(0).toUpperCase(),
+    icon: "📸"
+  };
+
+  const { error } = await supabaseClient
+    .from("creators")
+    .insert([creator]);
+
+  if (error) {
+    alert("Error saving profile");
+    console.error(error);
+    return;
+  }
+
+  closeModal();
+
+  // reload creators
+  await loadCreators();
+
+  alert("Profile added successfully 🚀");
+}
+document.addEventListener("DOMContentLoaded", () => {
+  loadCreators();
+  initButtons();
+});
+
+const supabaseUrl = "https://ybrwjudaxuxoksyocbvn.supabase.co";
+const supabaseKey = "YOUR_KEY";
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+// ─── DATA ───────────────────────────────────────────
+let creators = [];
+
+// ─── LOAD ───────────────────────────────────────────
+async function loadCreators() {
+  const { data, error } = await supabaseClient
+    .from("creators")
+    .select("*");
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  creators = data;
+  render();
 }
 
-// 3D Tilt Logic
-function tilt(e, card) {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = (y - centerY) / 10;
-    const rotateY = (centerX - x) / 10;
+// ─── STATE ──────────────────────────────────────────
+let activeGenre = 'all';
 
-    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+// ─── BUTTON INIT ────────────────────────────────────
+function initButtons() {
+  const brandBtn = document.querySelector(".btn-accent");
+  const creatorBtn = document.querySelector(".btn-ghost");
+
+  creatorBtn.onclick = openCreatorFlow;
+  brandBtn.onclick = openBrandFlow;
 }
 
-function resetTilt(card) {
-    card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+// ─── FLOWS ──────────────────────────────────────────
+function openBrandFlow() {
+  localStorage.setItem("role", "brand");
+
+  showCustomModal(
+    "Welcome, Brand 🚀",
+    "You can now browse creators and contact them.",
+    "Start exploring",
+    closeModal
+  );
 }
 
+function openCreatorFlow() {
+  localStorage.setItem("role", "creator");
+
+  showCustomModal(
+    "Join as Creator ✨",
+    "List your profile to get brand deals.",
+    "Add Profile",
+    goToCreatorForm
+  );
+}
+
+function goToCreatorForm() {
+  closeModal();
+  alert("Next step: connect form / Supabase insert");
+}
+
+// ─── MODAL SYSTEM ───────────────────────────────────
+function showCustomModal(title, text, actionText, actionFn) {
+  const modal = document.getElementById("igModal");
+
+  modal.querySelector("h2").innerText = title;
+  modal.querySelector("p").innerText = text;
+
+  const btn = modal.querySelector(".btn-accent");
+  btn.innerText = actionText;
+  btn.onclick = actionFn;
+
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("igModal").style.display = "none";
+}
+
+// ─── FILTER ─────────────────────────────────────────
+function getFiltered() {
+  return creators.filter(c => {
+    if (activeGenre !== 'all' && c.genre !== activeGenre) return false;
+    return true;
+  });
+}
+
+// ─── HELPERS ────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toString();
+}
+
+function getColor() {
+  return { bg:'rgba(200,241,53,0.12)', text:'#c8f135' };
+}
+
+// ─── CARD ───────────────────────────────────────────
+function renderCard(c) {
+  const col = getColor();
+
+  return `
+  <div class="creator-card" onclick="openDetail(${c.id})">
+    <div class="card-cover" style="background:${col.bg}">
+      <span>${c.icon || "👤"}</span>
+    </div>
+    <div class="card-body">
+      <div class="card-avatar" style="background:${col.bg};color:${col.text}">
+        ${c.avatar || c.name[0]}
+      </div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-handle">${c.handle}</div>
+      <div class="card-genre">${c.genre}</div>
+      <div class="card-meta">
+        <div>${fmt(c.followers)} followers</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── DETAIL ─────────────────────────────────────────
 function openDetail(id) {
-    const c = creators.find(x => x.id === id);
-    const panel = document.getElementById('detailPanel');
-    document.getElementById('panelContent').innerHTML = `
-        <h1 style="font-family:Syne; font-size:40px;">${c.name}</h1>
-        <p class="accent">${c.handle}</p>
-        <p style="margin: 20px 0; line-height: 1.6;">${c.bio}</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div style="background:#0a0a0f; padding:20px; border-radius:15px;">
-                <small>Followers</small><h2>${c.followers}</h2>
-            </div>
-            <div style="background:#0a0a0f; padding:20px; border-radius:15px;">
-                <small>Engagement</small><h2>${c.eng}</h2>
-            </div>
-        </div>
-        <button class="btn-accent" style="width:100%; margin-top:40px; padding:20px;">Contact Creator →</button>
-    `;
-    panel.classList.add('open');
+  const role = localStorage.getItem("role");
+
+  if (!role) {
+    showCustomModal(
+      "Choose your role",
+      "Are you a brand or creator?",
+      "I'm a brand",
+      openBrandFlow
+    );
+    return;
+  }
+
+  const c = creators.find(x => x.id === id);
+
+  document.getElementById('detailPanel').innerHTML = `
+    <h2>${c.name}</h2>
+    <p>${c.bio}</p>
+    <p><b>${c.rate}</b></p>
+    ${role === "brand" ? '<button class="btn-contact">Contact Creator</button>' : ''}
+  `;
+
+  document.getElementById('detailPanel').classList.add('open');
 }
 
-function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); }
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+// ─── RENDER ─────────────────────────────────────────
+function render() {
+  const list = getFiltered();
 
-render();
+  document.getElementById('grid').innerHTML =
+    list.map(renderCard).join('');
+
+  document.getElementById('stat-count').textContent = creators.length;
+  document.getElementById('countDisplay').textContent = list.length;
+}
+
+// ─── INIT ───────────────────────────────────────────
+function init() {
+  if (!localStorage.getItem("ig_popup_seen")) {
+    setTimeout(() => {
+      document.getElementById("igModal").style.display = "flex";
+    }, 1500);
+  }
+}
+
+init();
 </script>
+<div class="ig-modal-content" id="modalContent">
+  <h2>✨ List Your Profile</h2>
+  <p>Fill this to get discovered by brands.</p>
+
+  <form id="creatorForm" onsubmit="submitCreator(event)">
+    <div class="filter-group">
+      <label>Name</label>
+      <input type="text" id="name" required />
+    </div>
+
+    <div class="filter-group">
+      <label>Instagram Handle</label>
+      <input type="text" id="handle" required />
+    </div>
+
+    <div class="filter-group">
+      <label>Genre</label>
+      <select id="genre">
+        <option value="fashion">Fashion</option>
+        <option value="fitness">Fitness</option>
+        <option value="food">Food</option>
+        <option value="tech">Tech</option>
+        <option value="travel">Travel</option>
+        <option value="beauty">Beauty</option>
+        <option value="finance">Finance</option>
+        <option value="gaming">Gaming</option>
+        <option value="lifestyle">Lifestyle</option>
+        <option value="comedy">Comedy</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Followers</label>
+      <input type="number" id="followers" required />
+    </div>
+
+    <div class="filter-group">
+      <label>Bio</label>
+      <input type="text" id="bio" />
+    </div>
+
+    <div class="filter-group">
+      <label>Rate</label>
+      <input type="text" id="rate" />
+    </div>
+
+    <div class="ig-actions">
+      <button class="btn-accent" type="submit">Submit</button>
+      <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  </form>
+</div>
 </body>
 </html>
