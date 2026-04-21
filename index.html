@@ -904,15 +904,34 @@
   <div style="margin-top:6px;font-size:12px">© 2025 CreatorFind. All data is curated manually.</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  loadCreators();
+});
+const supabaseUrl = "https://ybrwjudaxuxoksyocbvn.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlicndqdWRheHV4b2tzeW9jYnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2ODYyMzQsImV4cCI6MjA5MjI2MjIzNH0.KjE88t46wPOvYDwWcTd6J866TY87ThY9hQg-80o4I1A";
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 // ─── DATA ───────────────────────────────────────────
 const FLEVELS = ["Any","1K","5K","10K","50K","100K","250K","500K","1M","5M","10M+"];
 const FVALUES = [0,1000,5000,10000,50000,100000,250000,500000,1000000,5000000,Infinity];
 
-const creators = [
-  { id:1, name:"Priya Sharma", handle:"@priyastyled", genre:"fashion", followers:820000, eng:4.2, views:1200000, avatar:"PS", icon:"👗", bio:"Fashion & lifestyle creator from Mumbai.", rate:"₹45,000", reels:[{e:"👗",v:"2.1M"},{e:"💄",v:"980K"},{e:"✨",v:"750K"}] },
-  { id:2, name:"Arjun Fitness", handle:"@arjunfit", genre:"fitness", followers:340000, eng:6.8, views:890000, avatar:"AF", icon:"💪", bio:"Fitness educator.", rate:"₹22,000", reels:[{e:"💪",v:"1.4M"},{e:"🏋",v:"800K"},{e:"🥗",v:"420K"}] }
-];
+let creators = [];
+
+async function loadCreators() {
+  const { data, error } = await supabaseClient
+    .from("creators")
+    .select("*");
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  creators = data;
+  render();
+};
 
 // ─── STATE ──────────────────────────────────────────
 let activeGenre = 'all';
