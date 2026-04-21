@@ -459,253 +459,121 @@
 </div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-// ── DATA ──────────────────────────────────────────────
+// ── SUPABASE CONFIG ───────────────────────────────────
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── DATA & STATE (Existing) ───────────────────────────
 const FLEVELS = ["Any","1K","5K","10K","50K","100K","250K","500K","1M","5M","10M+"];
 const FVALUES = [0,1000,5000,10000,50000,100000,250000,500000,1000000,5000000,Infinity];
-const COLORS = {
-  fashion:{bg:'rgba(255,95,160,0.15)',text:'#ff5fa0'},fitness:{bg:'rgba(200,241,53,0.12)',text:'#c8f135'},
-  food:{bg:'rgba(255,140,66,0.15)',text:'#ff8c42'},tech:{bg:'rgba(95,180,255,0.15)',text:'#5fb4ff'},
-  travel:{bg:'rgba(45,212,191,0.15)',text:'#2dd4bf'},beauty:{bg:'rgba(168,85,247,0.15)',text:'#a855f7'},
-  finance:{bg:'rgba(250,204,21,0.12)',text:'#facc15'},gaming:{bg:'rgba(168,85,247,0.15)',text:'#a855f7'},
-  lifestyle:{bg:'rgba(45,212,191,0.15)',text:'#2dd4bf'},comedy:{bg:'rgba(255,140,66,0.15)',text:'#ff8c42'},
-};
-const TIERS = {
-  nano:{label:'Nano',bg:'rgba(45,212,191,0.15)',color:'#2dd4bf'},
-  micro:{label:'Micro',bg:'rgba(95,180,255,0.15)',color:'#5fb4ff'},
-  macro:{label:'Macro',bg:'rgba(168,85,247,0.15)',color:'#a855f7'},
-  mega:{label:'Mega',bg:'rgba(255,95,160,0.15)',color:'#ff5fa0'},
-};
-const creators = [
-  {id:1,name:"Priya Sharma",handle:"@priyastyled",genre:"fashion",followers:820000,eng:4.2,views:1200000,avatar:"PS",icon:"👗",bio:"Fashion & lifestyle creator from Mumbai. Iconic lookbooks, brand collabs & street style content.",rate:"₹45,000",reels:[{e:"👗",v:"2.1M"},{e:"💄",v:"980K"},{e:"✨",v:"750K"},{e:"🛍",v:"600K"}]},
-  {id:2,name:"Arjun Fitness",handle:"@arjunfit",genre:"fitness",followers:340000,eng:6.8,views:890000,avatar:"AF",icon:"💪",bio:"Certified trainer & fitness educator. Workout tips, nutrition science & transformation stories.",rate:"₹22,000",reels:[{e:"💪",v:"1.4M"},{e:"🏋",v:"800K"},{e:"🥗",v:"420K"},{e:"🏃",v:"380K"}]},
-  {id:3,name:"Riya Eats",handle:"@riyaeats",genre:"food",followers:1500000,eng:5.1,views:3200000,avatar:"RE",icon:"🍜",bio:"Restaurant reviews, street food adventures & quick recipes across India.",rate:"₹80,000",reels:[{e:"🍜",v:"5.2M"},{e:"🍕",v:"3.1M"},{e:"🥘",v:"2.8M"},{e:"🧆",v:"1.9M"}]},
-  {id:4,name:"TechWala Raj",handle:"@techwalaraj",genre:"tech",followers:280000,eng:7.3,views:620000,avatar:"TR",icon:"📱",bio:"Unboxings, reviews & tech tips in Hindi. Making technology accessible to every Indian.",rate:"₹18,000",reels:[{e:"📱",v:"1.1M"},{e:"💻",v:"700K"},{e:"🎮",v:"500K"},{e:"📡",v:"320K"}]},
-  {id:5,name:"Wanderer Meera",handle:"@meerawanders",genre:"travel",followers:95000,eng:8.9,views:410000,avatar:"WM",icon:"✈️",bio:"Solo female traveller sharing budget tips & hidden gems across India & South East Asia.",rate:"₹8,000",reels:[{e:"🏔",v:"620K"},{e:"🏖",v:"390K"},{e:"🌅",v:"280K"},{e:"🗺",v:"210K"}]},
-  {id:6,name:"Glamour by Sana",handle:"@sanaglam",genre:"beauty",followers:2100000,eng:4.5,views:4800000,avatar:"GS",icon:"💅",bio:"Makeup tutorials, skincare reviews & beauty hacks trusted by 2M+ fans.",rate:"₹1,20,000",reels:[{e:"💄",v:"7.8M"},{e:"✨",v:"4.2M"},{e:"💅",v:"3.1M"},{e:"🪞",v:"2.4M"}]},
-  {id:7,name:"Dev Finance",handle:"@devfinance",genre:"finance",followers:410000,eng:5.6,views:780000,avatar:"DF",icon:"📊",bio:"Stocks, mutual funds & personal finance simplified for everyday Indians.",rate:"₹28,000",reels:[{e:"📊",v:"1.3M"},{e:"💰",v:"900K"},{e:"📈",v:"600K"},{e:"🏦",v:"450K"}]},
-  {id:8,name:"GamingWithKaran",handle:"@karangames",genre:"gaming",followers:760000,eng:9.1,views:2100000,avatar:"GK",icon:"🎮",bio:"BGMI, mobile gaming & esports. The fastest growing gaming channel in India.",rate:"₹38,000",reels:[{e:"🎮",v:"3.4M"},{e:"🏆",v:"2.1M"},{e:"⚡",v:"1.8M"},{e:"🎯",v:"1.5M"}]},
-  {id:9,name:"Naina Style",handle:"@nainastyle",genre:"fashion",followers:58000,eng:10.2,views:180000,avatar:"NS",icon:"👠",bio:"Sustainable fashion & thrift hauls. Micro-influencer with sky-high engagement.",rate:"₹5,000",reels:[{e:"👠",v:"280K"},{e:"👜",v:"190K"},{e:"🛍",v:"120K"},{e:"🌿",v:"95K"}]},
-  {id:10,name:"Chef Vikram",handle:"@chefvikram",genre:"food",followers:430000,eng:6.2,views:950000,avatar:"CV",icon:"👨‍🍳",bio:"5-star chef turned creator. Gourmet recipes made simple — from your home kitchen.",rate:"₹30,000",reels:[{e:"👨‍🍳",v:"1.6M"},{e:"🍳",v:"1.1M"},{e:"🥩",v:"700K"},{e:"🍰",v:"560K"}]},
-  {id:11,name:"Ananya Wellness",handle:"@ananyafit",genre:"fitness",followers:72000,eng:11.4,views:320000,avatar:"AW",icon:"🧘",bio:"Yoga, pilates & mindful wellness in Hindi & English.",rate:"₹6,500",reels:[{e:"🧘",v:"480K"},{e:"🏃",v:"310K"},{e:"🥦",v:"200K"},{e:"🌸",v:"170K"}]},
-  {id:12,name:"TravelBro Sid",handle:"@travelsidd",genre:"travel",followers:1800000,eng:3.8,views:2900000,avatar:"TS",icon:"🌍",bio:"International travel, luxury stays & adventure sports.",rate:"₹95,000",reels:[{e:"🌍",v:"4.2M"},{e:"🏄",v:"2.8M"},{e:"🏕",v:"1.9M"},{e:"🚀",v:"1.4M"}]},
-  {id:13,name:"Memes by Sahil",handle:"@sahilmemes",genre:"comedy",followers:1200000,eng:12.1,views:5100000,avatar:"MS",icon:"😂",bio:"India's most viral comedy creator. Relatable memes, skits & trending audio content.",rate:"₹65,000",reels:[{e:"😂",v:"8.1M"},{e:"🤣",v:"5.6M"},{e:"🎭",v:"3.9M"},{e:"⚡",v:"2.8M"}]},
-  {id:14,name:"Neha Lifestyle",handle:"@nehavibes",genre:"lifestyle",followers:390000,eng:7.8,views:820000,avatar:"NL",icon:"🌟",bio:"Morning routines, home decor & mindful living. Aesthetic content that inspires.",rate:"₹24,000",reels:[{e:"🌟",v:"1.2M"},{e:"🏡",v:"780K"},{e:"☕",v:"530K"},{e:"📚",v:"410K"}]},
-  {id:15,name:"StartupWala",handle:"@startupwala",genre:"finance",followers:88000,eng:9.3,views:290000,avatar:"SW",icon:"🚀",bio:"Startup stories, founder interviews & business tips for Indian entrepreneurs.",rate:"₹7,000",reels:[{e:"🚀",v:"450K"},{e:"💡",v:"320K"},{e:"📈",v:"240K"},{e:"🤝",v:"180K"}]},
-  {id:16,name:"Preet Comedy",handle:"@preetcomedy",genre:"comedy",followers:3400000,eng:8.6,views:8900000,avatar:"PC",icon:"🎭",bio:"Viral comedy skits & Punjabi humor. India's top comedy creator.",rate:"₹2,00,000",reels:[{e:"🎭",v:"12M"},{e:"😂",v:"9.4M"},{e:"🤣",v:"7.2M"},{e:"⚡",v:"5.8M"}]},
-];
-
-// ── STATE ─────────────────────────────────────────────
+const COLORS = { /* ... keep your existing COLORS object ... */ };
+const TIERS = { /* ... keep your existing TIERS object ... */ };
 let activeGenre = 'all', selectedId = null;
 
-// ── MODAL HELPERS ─────────────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-}
-function overlayClick(e, id) {
-  if (e.target === document.getElementById(id)) closeModal(id);
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') ['creatorModal','brandModal','successModal'].forEach(closeModal);
-});
+// Copy your existing creators array here or keep it as a fallback
+const creators = [ /* ... your existing static data ... */ ];
 
-function showSuccess(icon, title, sub, rows) {
-  document.getElementById('success-icon').textContent = icon;
-  document.getElementById('success-title').textContent = title;
-  document.getElementById('success-sub').textContent = sub;
-  document.getElementById('success-details').innerHTML = rows.map(r =>
-    `<div class="sdr"><span class="k">${r[0]}</span><span class="v" ${r[2]?`style="color:${r[2]}"`:''} >${r[1]}</span></div>`
-  ).join('');
-  openModal('successModal');
-}
-
-// ── CREATOR SUBMIT ────────────────────────────────────
-function submitCreator(e) {
+// ── NEW: DATABASE SUBMISSION FOR CREATORS ──────────────
+async function submitCreator(e) {
   e.preventDefault();
   const err = document.getElementById('cf-err');
   const btn = document.getElementById('cf-btn');
-  const name      = document.getElementById('cf-name').value.trim();
-  const handle    = document.getElementById('cf-handle').value.trim();
-  const genre     = document.getElementById('cf-genre').value;
-  const followers = document.getElementById('cf-followers').value;
-  const email     = document.getElementById('cf-email').value.trim();
-  const rate      = document.getElementById('cf-rate').value.trim();
+  
+  const formData = {
+    full_name: document.getElementById('cf-name').value.trim(),
+    handle: document.getElementById('cf-handle').value.trim(),
+    genre: document.getElementById('cf-genre').value,
+    followers: parseInt(document.getElementById('cf-followers').value),
+    rate: document.getElementById('cf-rate').value.trim(),
+    email: document.getElementById('cf-email').value.trim(),
+    bio: document.getElementById('cf-bio').value.trim()
+  };
 
-  if (!name || !handle || !genre || !followers || !email) {
-    err.textContent = 'Please fill in all required fields marked with *'; err.style.display = 'block'; return;
+  // Basic Validation
+  if (!formData.full_name || !formData.handle || !formData.genre || !formData.followers || !formData.email) {
+    err.textContent = 'Please fill in all required fields marked with *';
+    err.style.display = 'block';
+    return;
   }
-  if (!email.includes('@')) {
-    err.textContent = 'Please enter a valid email address'; err.style.display = 'block'; return;
-  }
+
   err.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Submitting...';
+  btn.disabled = true;
+  btn.textContent = 'Storing in Database...';
 
-  setTimeout(() => {
-    btn.disabled = false; btn.textContent = 'Submit profile →';
-    document.getElementById('cf-name').value = '';
-    document.getElementById('cf-handle').value = '';
-    document.getElementById('cf-genre').value = '';
-    document.getElementById('cf-followers').value = '';
-    document.getElementById('cf-rate').value = '';
-    document.getElementById('cf-email').value = '';
-    document.getElementById('cf-bio').value = '';
+  // INSERT INTO SUPABASE
+  const { data, error } = await supabase
+    .from('creators_list')
+    .insert([formData]);
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Submit profile →';
+    err.textContent = 'Database Error: ' + error.message;
+    err.style.display = 'block';
+  } else {
+    // Success Logic
+    btn.disabled = false;
+    btn.textContent = 'Submit profile →';
+    e.target.reset(); // Clear form
     closeModal('creatorModal');
-    const f = parseInt(followers);
-    const fmtF = f>=1000000?(f/1000000).toFixed(1)+'M':f>=1000?(f/1000).toFixed(0)+'K':f;
-    showSuccess('🎉', "You're listed!", "Your creator profile has been submitted. Brands browsing CreatorFind will now be able to discover and contact you.", [
-      ['Name', name],
-      ['Handle', handle],
-      ['Genre', genre],
-      ['Followers', fmtF],
-      ...(rate ? [['Rate', rate]] : []),
-      ['Email', email],
-      ['Status', 'Live on platform', '#c8f135'],
+    
+    const fmtF = formData.followers >= 1000000 ? (formData.followers/1000000).toFixed(1)+'M' : formData.followers >= 1000 ? (formData.followers/1000).toFixed(0)+'K' : formData.followers;
+    
+    showSuccess('🎉', "Successfully Saved!", "Your data is now stored in Supabase. Brands will see you soon.", [
+      ['Name', formData.full_name],
+      ['Handle', formData.handle],
+      ['Status', 'Database Verified', '#c8f135'],
     ]);
-  }, 900);
-}
-
-// ── BRAND SUBMIT ──────────────────────────────────────
-function submitBrand() {
-  const brandName  = document.getElementById('brand-name').value.trim();
-  const brandEmail = document.getElementById('brand-email').value.trim();
-  closeModal('brandModal');
-  showSuccess('🚀', 'Welcome' + (brandName ? ', ' + brandName : '') + '!', 'You now have full access to browse and contact all creators on the platform. Use the filters below to find your match.', [
-    ['Access level', 'Full access unlocked', '#c8f135'],
-    ...(brandName  ? [['Brand', brandName]] : []),
-    ...(brandEmail ? [['Email', brandEmail]] : []),
-    ['Creators available', creators.length + ' creators'],
-  ]);
-}
-
-// ── HELPERS ───────────────────────────────────────────
-function fmt(n) { if(n>=1000000)return(n/1000000).toFixed(1)+'M'; if(n>=1000)return(n/1000).toFixed(0)+'K'; return n.toString(); }
-function tierOf(f) { if(f<10000)return'nano'; if(f<100000)return'micro'; if(f<1000000)return'macro'; return'mega'; }
-function col(g) { return COLORS[g]||{bg:'rgba(122,122,144,0.15)',text:'#7a7a90'}; }
-
-// ── FILTER ────────────────────────────────────────────
-function getFiltered() {
-  const minF=FVALUES[+document.getElementById('minF').value];
-  const maxF=FVALUES[+document.getElementById('maxF').value];
-  const tier=document.getElementById('tierSel').value;
-  const sort=document.getElementById('sortSel').value;
-  let list=creators.filter(c=>{
-    if(activeGenre!=='all'&&c.genre!==activeGenre)return false;
-    if(c.followers<minF||c.followers>maxF)return false;
-    if(tier!=='all'&&tierOf(c.followers)!==tier)return false;
-    return true;
-  });
-  if(sort==='followers')list.sort((a,b)=>b.followers-a.followers);
-  else if(sort==='engagement')list.sort((a,b)=>b.eng-a.eng);
-  else list.sort((a,b)=>b.views-a.views);
-  return list;
-}
-
-// ── RENDER CARD ───────────────────────────────────────
-function renderCard(c, delay) {
-  const c2=col(c.genre), t=TIERS[tierOf(c.followers)];
-  return `<div class="creator-card${selectedId===c.id?' selected':''}" style="animation-delay:${delay}ms" onclick="openDetail(${c.id})">
-    <div class="tier-badge" style="background:${t.bg};color:${t.color}">${t.label}</div>
-    <div class="card-cover" style="background:${c2.bg}"><span style="font-size:36px">${c.icon}</span></div>
-    <div class="card-body">
-      <div class="card-avatar" style="background:${c2.bg};color:${c2.text}">${c.avatar}</div>
-      <div class="card-name">${c.name}</div>
-      <div class="card-handle">${c.handle}</div>
-      <div class="card-genre" style="background:${c2.bg};color:${c2.text}">${c.genre}</div>
-      <div class="card-reels">${c.reels.slice(0,3).map(r=>`<div class="reel-chip" style="background:${c2.bg}"><span style="font-size:18px">${r.e}</span><span class="reel-views">${r.v}</span></div>`).join('')}</div>
-      <div class="card-meta">
-        <div class="meta-item"><span class="meta-val">${fmt(c.followers)}</span><span class="meta-lbl">Followers</span></div>
-        <div class="meta-item"><span class="meta-val">${c.eng}%</span><span class="meta-lbl">Engagement</span></div>
-        <div class="meta-item"><span class="meta-val">${fmt(c.views)}</span><span class="meta-lbl">Avg views</span></div>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ── RENDER DETAIL ─────────────────────────────────────
-function openDetail(id) {
-  selectedId=id;
-  const c=creators.find(x=>x.id===id), c2=col(c.genre), t=TIERS[tierOf(c.followers)];
-  const panel=document.getElementById('detailPanel');
-  panel.innerHTML=`
-    <div class="dp-header">
-      <div class="dp-avatar" style="background:${c2.bg};color:${c2.text}">${c.avatar}</div>
-      <div class="dp-info">
-        <div class="dp-name">${c.name}</div>
-        <div class="dp-handle">${c.handle} · <span style="color:${c2.text}">${c.genre}</span> · <span style="background:${t.bg};color:${t.color};padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600">${t.label}</span></div>
-        <div class="dp-bio">${c.bio}</div>
-      </div>
-      <button onclick="closeDetail()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0">✕ Close</button>
-    </div>
-    <div class="dp-stats">
-      <div class="dp-stat"><span class="v">${fmt(c.followers)}</span><span class="l">Followers</span></div>
-      <div class="dp-stat"><span class="v">${c.eng}%</span><span class="l">Engagement</span></div>
-      <div class="dp-stat"><span class="v">${fmt(c.views)}</span><span class="l">Avg reel views</span></div>
-      <div class="dp-stat"><span class="v">${c.rate}</span><span class="l">Rate per post</span></div>
-    </div>
-    <div class="dp-reels-title">Top reels</div>
-    <div class="dp-reels">${c.reels.map(r=>`<div class="dp-reel"><div class="dp-reel-cover" style="background:${c2.bg}">${r.e}</div><div class="dp-reel-views">${r.v} views</div></div>`).join('')}</div>
-    <div class="dp-footer">
-      <button class="btn-contact" onclick="contactCreator('${c.name}','${c.handle}','${c.rate}')">Contact creator →</button>
-      <button class="btn-save">♡ Save</button>
-      <div class="dp-rate">${c.rate} <span>/ post</span></div>
-    </div>`;
-  panel.classList.add('open');
-  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
-  render();
-}
-
-function closeDetail() { selectedId=null; document.getElementById('detailPanel').classList.remove('open'); render(); }
-
-function contactCreator(name, handle, rate) {
-  showSuccess('📩', 'Contact request sent!', 'Your interest in this creator has been noted. In the full version, this sends them a message or reveals their contact details.', [
-    ['Creator', name],
-    ['Handle', handle],
-    ['Rate', rate],
-    ['Next step', 'Connect Supabase to notify creator', '#c8f135'],
-  ]);
-}
-
-// ── MAIN RENDER ───────────────────────────────────────
-function render() {
-  const list=getFiltered();
-  const grid=document.getElementById('grid');
-  document.getElementById('countDisplay').textContent=list.length;
-  document.getElementById('stat-count').textContent=creators.length;
-  if(list.length){
-    document.getElementById('statReach').textContent=fmt(Math.round(list.reduce((a,c)=>a+c.followers,0)/list.length));
-    document.getElementById('statEng').textContent=(list.reduce((a,c)=>a+c.eng,0)/list.length).toFixed(1)+'%';
-    document.getElementById('statTotal').textContent=fmt(list.reduce((a,c)=>a+c.followers,0));
   }
-  if(!list.length){grid.innerHTML='';document.getElementById('empty').classList.add('show');}
-  else{document.getElementById('empty').classList.remove('show');grid.innerHTML=list.map((c,i)=>renderCard(c,i*30)).join('');}
-  if(selectedId&&!list.find(c=>c.id===selectedId))closeDetail();
 }
 
-// ── EVENTS ────────────────────────────────────────────
-document.getElementById('genrePills').addEventListener('click',e=>{
-  const p=e.target.closest('.pill'); if(!p)return;
-  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
-  p.classList.add('active'); activeGenre=p.dataset.genre; closeDetail(); render();
-});
-['minF','maxF'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{
-    document.getElementById('minFVal').textContent=FLEVELS[+document.getElementById('minF').value];
-    document.getElementById('maxFVal').textContent=FLEVELS[+document.getElementById('maxF').value];
-    render();
-  });
-});
-document.getElementById('tierSel').addEventListener('change',render);
-document.getElementById('sortSel').addEventListener('change',render);
+// ── NEW: DATABASE SUBMISSION FOR BRANDS ───────────────
+async function submitBrand() {
+  const brandName = document.getElementById('brand-name').value.trim();
+  const brandEmail = document.getElementById('brand-email').value.trim();
+
+  if (!brandEmail) {
+    alert("Email is required");
+    return;
+  }
+
+  const { error } = await supabase
+    .from('brand_leads')
+    .insert([{ brand_name: brandName, brand_email: brandEmail }]);
+
+  if (error) {
+    alert("Error saving brand: " + error.message);
+  } else {
+    closeModal('brandModal');
+    showSuccess('🚀', 'Brand Registered', 'Your interest has been saved to our database.', [
+      ['Access', 'Granted', '#c8f135'],
+      ['Brand', brandName || 'Individual']
+    ]);
+  }
+}
+
+// ── HELPERS, FILTERS & RENDER ────────────────────────
+// ... Keep all your existing functions: fmt(), tierOf(), col(), getFiltered(), renderCard(), openDetail(), closeDetail(), contactCreator() ...
+
+function render() {
+  // Use your original render logic here
+  // Note: To make this "live", you would eventually use:
+  // const { data } = await supabase.from('creators_list').select('*') 
+  // and set that to your 'creators' variable.
+  
+  const list = getFiltered();
+  const grid = document.getElementById('grid');
+  document.getElementById('countDisplay').textContent = list.length;
+  // ... rest of your existing render() logic
+}
 
 // ── INIT ──────────────────────────────────────────────
 render();
-let cnt=0;
-const timer=setInterval(()=>{cnt=Math.min(cnt+1,creators.length);document.getElementById('stat-count').textContent=cnt;if(cnt>=creators.length)clearInterval(timer);},60);
+// ... existing timer logic
 </script>
 </body>
 </html>
