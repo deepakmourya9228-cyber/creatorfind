@@ -3,283 +3,709 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CreatorFind — 3D Discovery Platform</title>
+<title>CreatorFind — India's Influencer Discovery Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050508;
-    --surface: rgba(25, 25, 35, 0.7);
-    --surface-solid: #13131a;
-    --border: rgba(255,255,255,0.1);
-    --accent: #c8f135;
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
     --text: #f0f0f5;
-    --muted: #8a8a9a;
+    --muted: #7a7a90;
+    --accent: #c8f135;
+    --accent-dark: #a8d015;
+    --pink: #ff5fa0;
+    --blue: #5fb4ff;
+    --orange: #ff8c42;
+    --purple: #a855f7;
+    --teal: #2dd4bf;
   }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; z-index: 0; }
+  .hero-glow { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 700px; height: 400px; background: radial-gradient(ellipse, rgba(200,241,53,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body { 
-    background: var(--bg); 
-    color: var(--text); 
-    font-family: 'DM Sans', sans-serif; 
-    perspective: 1200px; /* Essential for 3D */
-    overflow-x: hidden;
-  }
-
-  /* Animated 3D Background */
-  .grid-bg {
-    position: fixed; inset: 0;
-    background-image: 
-      linear-gradient(rgba(200, 241, 53, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(200, 241, 53, 0.05) 1px, transparent 1px);
-    background-size: 60px 60px;
-    transform: rotateX(60deg) translateY(-200px);
-    z-index: -1;
-    animation: gridMove 20s linear infinite;
-  }
-  @keyframes gridMove { from { background-position: 0 0; } to { background-position: 0 1000px; } }
-
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
-
-  /* --- NAV --- */
-  nav { 
-    position: sticky; top: 0; z-index: 1000;
-    background: rgba(5, 5, 8, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 0;
-  }
-  .nav-inner { display: flex; justify-content: space-between; align-items: center; }
-  .logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; text-decoration: none; color: white; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(10,10,15,0.85); backdrop-filter: blur(16px); z-index: 100; }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
   .logo span { color: var(--accent); }
-  .btn-accent { 
-    background: var(--accent); color: black; border: none; 
-    padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(200, 241, 53, 0.3); transition: 0.3s;
-  }
-  .btn-accent:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(200, 241, 53, 0.5); }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-ghost { padding: 8px 18px; border: 1px solid var(--border-hover); border-radius: 8px; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-ghost:hover { color: var(--text); background: var(--surface); }
+  .btn-accent { padding: 8px 20px; border: none; border-radius: 8px; background: var(--accent); color: #0a0a0f; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); }
 
-  /* --- HERO (Spatial Layer) --- */
-  .hero { 
-    padding: 100px 0 60px; text-align: center; 
-    transform-style: preserve-3d;
-  }
-  .hero h1 { 
-    font-family: 'Syne', sans-serif; font-size: 72px; line-height: 1; margin-bottom: 24px;
-    transform: translateZ(50px); /* Pushes text forward */
-  }
+  .hero { padding: 80px 0 60px; text-align: center; }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1px solid rgba(200,241,53,0.3); border-radius: 100px; font-size: 12px; color: var(--accent); font-weight: 500; letter-spacing: 0.04em; margin-bottom: 28px; background: rgba(200,241,53,0.06); }
+  .hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(42px, 7vw, 80px); font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px; }
+  .hero h1 em { font-style: normal; color: var(--accent); display: block; }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 520px; margin: 0 auto 36px; font-weight: 300; }
+  .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 48px; padding-top: 48px; border-top: 1px solid var(--border); }
+  .hero-stat { text-align: center; }
+  .hero-stat .val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; color: var(--text); display: block; }
+  .hero-stat .lbl { font-size: 13px; color: var(--muted); }
 
-  /* --- 3D CARDS --- */
-  .creators-grid { 
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 30px; padding-bottom: 100px;
-  }
-  
-  .creator-card {
-    background: var(--surface);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 24px;
-    transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-    transform-style: preserve-3d;
-    cursor: pointer;
-    position: relative;
-  }
+  .filter-section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; margin-bottom: 32px; }
+  .filter-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .filter-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  .genre-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill { padding: 7px 16px; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.18s; background: transparent; font-family: 'DM Sans', sans-serif; user-select: none; white-space: nowrap; }
+  .pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .pill.active { background: var(--accent); border-color: var(--accent); color: #0a0a0f; font-weight: 500; }
+  .filter-bottom { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; }
+  .filter-group label { font-size: 12px; color: var(--muted); }
+  .filter-group select { padding: 9px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; transition: border-color 0.2s; }
+  .filter-group select:focus { border-color: var(--accent); }
+  .range-wrap { display: flex; align-items: center; gap: 10px; }
+  .range-wrap input[type=range] { flex: 1; height: 4px; accent-color: var(--accent); cursor: pointer; background: var(--surface2); border-radius: 4px; outline: none; border: none; appearance: none; -webkit-appearance: none; }
+  .range-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--bg); }
+  .range-val { font-size: 12px; font-weight: 500; color: var(--accent); min-width: 54px; text-align: right; }
 
-  .creator-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  }
+  .results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .results-count { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; }
+  .results-count span { color: var(--accent); }
+  .summary-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .summary-pill { padding: 4px 12px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .summary-pill strong { color: var(--text); }
 
-  .card-content { transform: translateZ(30px); } /* UI floats above card */
+  .creators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .creator-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.22s; position: relative; animation: fadeIn 0.3s ease both; }
+  .creator-card:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+  .creator-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 16px 40px rgba(200,241,53,0.12); }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-cover { height: 80px; display: flex; align-items: center; justify-content: center; font-size: 32px; position: relative; overflow: hidden; }
+  .card-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--surface) 100%); }
+  .card-body { padding: 0 16px 16px; }
+  .card-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; font-family: 'Syne', sans-serif; border: 2px solid var(--surface); margin-top: -24px; margin-bottom: 10px; position: relative; z-index: 1; }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .card-handle { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .card-genre { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+  .card-reels { display: flex; gap: 6px; margin-bottom: 12px; }
+  .reel-chip { flex: 1; height: 52px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 18px; position: relative; overflow: hidden; border: 1px solid var(--border); }
+  .reel-chip .reel-views { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.03em; position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; }
+  .card-meta { display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); }
+  .meta-item { text-align: center; }
+  .meta-val { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); display: block; }
+  .meta-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .tier-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; z-index: 2; }
 
-  .avatar {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: var(--accent); color: black;
+  .detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 40px; display: none; animation: slideUp 0.25s ease; }
+  .detail-panel.open { display: block; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .dp-header { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; }
+  .dp-avatar { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; font-family: 'Syne', sans-serif; flex-shrink: 0; }
+  .dp-info { flex: 1; }
+  .dp-name { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .dp-handle { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .dp-bio { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 540px; }
+  .dp-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .dp-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .dp-stat .v { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); display: block; margin-bottom: 4px; }
+  .dp-stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .dp-reels-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .dp-reels { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 28px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .dp-reel { flex-shrink: 0; width: 100px; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; transition: border-color 0.2s; cursor: pointer; }
+  .dp-reel:hover { border-color: var(--border-hover); }
+  .dp-reel-cover { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+  .dp-reel-views { padding: 6px 8px; font-size: 11px; color: var(--muted); font-weight: 500; text-align: center; border-top: 1px solid var(--border); }
+  .dp-footer { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .btn-contact { padding: 12px 28px; background: var(--accent); color: #0a0a0f; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em; transition: all 0.2s; }
+  .btn-contact:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-save { padding: 12px 20px; border: 1px solid var(--border-hover); border-radius: 10px; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+  .btn-save:hover { color: var(--text); border-color: var(--text); }
+  .dp-rate { margin-left: auto; font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent); }
+  .dp-rate span { font-size: 12px; color: var(--muted); font-family: 'DM Sans'; font-weight: 400; }
+
+  .empty { text-align: center; padding: 80px 20px; color: var(--muted); display: none; }
+  .empty.show { display: block; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty h3 { font-family: 'Syne', sans-serif; font-size: 20px; color: var(--text); margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: center; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 4px; }
+
+  /* ═══════════════════════════════
+     MODAL SYSTEM
+  ═══════════════════════════════ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.78);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-family: 'Syne'; margin-bottom: 16px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    z-index: 9999; padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.22s ease;
   }
-
-  /* --- FILTERS --- */
-  .filter-section {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 32px; margin-bottom: 40px;
-    backdrop-filter: blur(20px);
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--surface); border: 1px solid var(--border-hover);
+    border-radius: 20px; padding: 36px 32px 32px;
+    width: 100%; max-width: 480px;
+    position: relative;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.25s cubic-bezier(0.175,0.885,0.32,1.1);
+    max-height: 92vh; overflow-y: auto;
   }
-
-  .pill {
-    padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border);
-    background: transparent; color: var(--muted); cursor: pointer; transition: 0.2s;
+  .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1px solid var(--border-hover); background: transparent;
+    color: var(--muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; line-height: 1;
   }
-  .pill.active { background: var(--accent); color: black; border-color: var(--accent); }
+  .modal-close:hover { color: var(--text); border-color: var(--text); }
+  .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.55; }
 
-  /* --- DETAIL PANEL (Layered) --- */
-  .detail-panel {
-    position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 800px; height: 80vh;
-    background: var(--surface-solid);
-    border: 1px solid var(--accent);
-    border-radius: 32px; z-index: 2000;
-    display: none; padding: 40px;
-    box-shadow: 0 0 100px rgba(0,0,0,0.8);
-    overflow-y: auto;
+  /* Form fields */
+  .form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-field label { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    padding: 11px 14px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%;
   }
-  .detail-panel.open { display: block; animation: panelIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-  @keyframes panelIn { from { opacity: 0; transform: translateX(-50%) translateZ(-100px); } }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { border-color: var(--accent); }
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: var(--muted); }
+  .form-field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .form-field textarea { resize: none; height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-error { color: var(--pink); font-size: 12px; margin-bottom: 12px; display: none; }
 
-  .btn-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; cursor: pointer; font-size: 24px; }
+  .modal-footer { display: flex; gap: 10px; margin-top: 10px; }
+  .btn-submit { flex: 1; padding: 13px; background: var(--accent); color: #0a0a0f; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-submit:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-cancel { padding: 13px 20px; border: 1px solid var(--border-hover); border-radius: 10px; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-cancel:hover { color: var(--text); border-color: var(--text); }
 
-  /* Modal Overlays for all buttons */
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    display: none; align-items: center; justify-content: center; z-index: 3000;
+  /* Brand perks grid */
+  .brand-perks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .perk-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .perk-icon { font-size: 18px; margin-bottom: 6px; }
+  .perk-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .perk-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* Success modal */
+  .success-box { text-align: center; }
+  .success-ring {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(200,241,53,0.1); border: 1.5px solid rgba(200,241,53,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 20px;
+    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
   }
-  .modal-box { 
-    background: var(--surface-solid); border: 1px solid var(--border);
-    padding: 40px; border-radius: 24px; max-width: 400px; width: 100%;
-  }
+  @keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .success-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+  .success-details { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 24px; text-align: left; }
+  .sdr { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+  .sdr:last-child { border-bottom: none; }
+  .sdr .k { color: var(--muted); }
+  .sdr .v { color: var(--text); font-weight: 500; }
 
-  input, select, textarea {
-    width: 100%; padding: 12px; background: #0a0a0f; border: 1px solid var(--border);
-    border-radius: 10px; color: white; margin-top: 8px; margin-bottom: 20px;
+  @media (max-width: 640px) {
+    .container { padding: 0 16px; }
+    .nav-inner { padding: 0 16px; }
+    .hero h1 { font-size: 38px; letter-spacing: -1px; }
+    .hero-stats { gap: 20px; }
+    .dp-stats { grid-template-columns: repeat(2, 1fr); }
+    .filter-bottom { flex-direction: column; }
+    .filter-group { min-width: 100%; }
+    .modal-box { padding: 28px 20px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+    .brand-perks { grid-template-columns: 1fr; }
   }
-
 </style>
 </head>
 <body>
+<div class="hero-glow"></div>
 
-<div class="grid-bg"></div>
-
+<!-- NAV -->
 <nav>
-  <div class="container nav-inner">
-    <a href="#" class="logo">creator<span>find</span></a>
-    <div style="display: flex; gap: 12px;">
-        <button class="pill" onclick="openModal('creatorModal')">List Profile</button>
-        <button class="btn-accent" onclick="openModal('brandModal')">I'm a Brand</button>
+  <div class="nav-inner">
+    <a class="logo" href="#">creator<span>find</span></a>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="openModal('creatorModal')">List your profile</button>
+      <button class="btn-accent" onclick="openModal('brandModal')">I'm a brand</button>
     </div>
   </div>
 </nav>
 
+<!-- PAGE -->
 <div class="container">
   <section class="hero">
-    <h1>Discover the<br><span style="color:var(--accent)">Spatial Creator</span> Economy</h1>
-    <p style="color:var(--muted); font-size: 18px; max-width: 600px; margin: 0 auto;">Experience influencer discovery in 3D. Filter by niche, reach, and engagement.</p>
+    <div class="hero-eyebrow">India's #1 Creator Discovery Platform</div>
+    <h1>Find the perfect<em>ad creator.</em></h1>
+    <p>Discover authentic Indian creators across every niche. Filter by genre, audience size, and engagement — then connect instantly.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="val" id="stat-count">0</span><span class="lbl">Creators listed</span></div>
+      <div class="hero-stat"><span class="val">12+</span><span class="lbl">Genres covered</span></div>
+      <div class="hero-stat"><span class="val">500+</span><span class="lbl">Brands connected</span></div>
+      <div class="hero-stat"><span class="val">₹0</span><span class="lbl">Platform fee</span></div>
+    </div>
   </section>
 
   <section class="filter-section">
-    <div id="genrePills" style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <div class="filter-top">
+      <span class="filter-label">Genre</span>
+      <div class="genre-pills" id="genrePills">
         <button class="pill active" data-genre="all">All</button>
-        <button class="pill" data-genre="fashion">Fashion</button>
-        <button class="pill" data-genre="tech">Tech</button>
-        <button class="pill" data-genre="fitness">Fitness</button>
-        <button class="pill" data-genre="food">Food</button>
+        <button class="pill" data-genre="fashion">👗 Fashion</button>
+        <button class="pill" data-genre="fitness">💪 Fitness</button>
+        <button class="pill" data-genre="food">🍜 Food</button>
+        <button class="pill" data-genre="tech">📱 Tech</button>
+        <button class="pill" data-genre="travel">✈️ Travel</button>
+        <button class="pill" data-genre="beauty">💄 Beauty</button>
+        <button class="pill" data-genre="finance">📊 Finance</button>
+        <button class="pill" data-genre="gaming">🎮 Gaming</button>
+        <button class="pill" data-genre="lifestyle">🌟 Lifestyle</button>
+        <button class="pill" data-genre="comedy">😂 Comedy</button>
+      </div>
+    </div>
+    <div class="filter-bottom">
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Min followers</label>
+        <div class="range-wrap">
+          <input type="range" id="minF" min="0" max="10" value="0" step="1">
+          <span class="range-val" id="minFVal">Any</span>
+        </div>
+      </div>
+      <div class="filter-group" style="flex:1;min-width:200px">
+        <label>Max followers</label>
+        <div class="range-wrap">
+          <input type="range" id="maxF" min="0" max="10" value="10" step="1">
+          <span class="range-val" id="maxFVal">10M+</span>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Creator tier</label>
+        <select id="tierSel">
+          <option value="all">All tiers</option>
+          <option value="nano">Nano (1k–10k)</option>
+          <option value="micro">Micro (10k–100k)</option>
+          <option value="macro">Macro (100k–1M)</option>
+          <option value="mega">Mega (1M+)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Sort by</label>
+        <select id="sortSel">
+          <option value="followers">Most followers</option>
+          <option value="engagement">Best engagement</option>
+          <option value="views">Most reel views</option>
+        </select>
+      </div>
     </div>
   </section>
 
-  <div class="creators-grid" id="grid">
+  <div class="results-bar">
+    <div class="results-count">Showing <span id="countDisplay">0</span> creators</div>
+    <div class="summary-pills">
+      <div class="summary-pill">Avg reach: <strong id="statReach">—</strong></div>
+      <div class="summary-pill">Avg engagement: <strong id="statEng">—</strong></div>
+      <div class="summary-pill">Total audience: <strong id="statTotal">—</strong></div>
     </div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel"></div>
+  <div class="creators-grid" id="grid"></div>
+  <div class="empty" id="empty">
+    <div class="empty-icon">🔍</div>
+    <h3>No creators found</h3>
+    <p>Try broadening your filters.</p>
+  </div>
 </div>
 
-<div class="detail-panel" id="detailPanel">
-    <button class="btn-close" onclick="closeDetail()">✕</button>
-    <div id="panelContent"></div>
+<footer>
+  <div>Built with ♥ in India &nbsp;·&nbsp; <a href="#" onclick="openModal('creatorModal');return false;">Add your profile</a> &nbsp;·&nbsp; <a href="#" onclick="openModal('brandModal');return false;">For brands</a></div>
+  <div style="margin-top:6px;font-size:12px">© 2025 CreatorFind. All data is curated manually.</div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════
+     MODAL 1 · CREATOR SIGNUP
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="creatorModal" onclick="overlayClick(event,'creatorModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('creatorModal')">✕</button>
+    <div class="modal-icon">✨</div>
+    <div class="modal-title">List your profile</div>
+    <div class="modal-sub">Get discovered by 500+ brands actively looking for creators like you.</div>
+
+    <form onsubmit="submitCreator(event)" novalidate>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Full name *</label>
+          <input type="text" id="cf-name" placeholder="Priya Sharma" required>
+        </div>
+        <div class="form-field">
+          <label>Instagram handle *</label>
+          <input type="text" id="cf-handle" placeholder="@yourhandle" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Genre *</label>
+          <select id="cf-genre" required>
+            <option value="">Select genre</option>
+            <option value="fashion">👗 Fashion</option>
+            <option value="fitness">💪 Fitness</option>
+            <option value="food">🍜 Food & cooking</option>
+            <option value="tech">📱 Tech & gadgets</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="beauty">💄 Beauty</option>
+            <option value="finance">📊 Finance</option>
+            <option value="gaming">🎮 Gaming</option>
+            <option value="lifestyle">🌟 Lifestyle</option>
+            <option value="comedy">😂 Comedy</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Followers count *</label>
+          <input type="number" id="cf-followers" placeholder="e.g. 50000" required min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Rate per post (₹)</label>
+          <input type="text" id="cf-rate" placeholder="e.g. ₹15,000">
+        </div>
+        <div class="form-field">
+          <label>Email address *</label>
+          <input type="email" id="cf-email" placeholder="you@email.com" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Short bio</label>
+        <textarea id="cf-bio" placeholder="Tell brands about yourself and your content..."></textarea>
+      </div>
+      <div class="form-error" id="cf-err"></div>
+      <div class="modal-footer">
+        <button type="submit" class="btn-submit" id="cf-btn">Submit profile →</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('creatorModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<div class="overlay" id="creatorModal">
-    <div class="modal-box">
-        <h2 style="margin-bottom: 20px;">List your Profile</h2>
-        <input type="text" placeholder="Full Name">
-        <input type="text" placeholder="Instagram Handle">
-        <select>
-            <option>Fashion</option>
-            <option>Tech</option>
-        </select>
-        <button class="btn-accent" style="width: 100%;" onclick="closeModal('creatorModal')">Submit →</button>
+
+<!-- ═══════════════════════════════════════
+     MODAL 2 · BRAND WELCOME
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="brandModal" onclick="overlayClick(event,'brandModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('brandModal')">✕</button>
+    <div class="modal-icon">🚀</div>
+    <div class="modal-title">Find your perfect creator</div>
+    <div class="modal-sub">Access hundreds of verified Indian creators — filter by niche, reach, and budget.</div>
+
+    <div class="brand-perks">
+      <div class="perk-card"><div class="perk-icon">🎯</div><div class="perk-title">Genre filters</div><div class="perk-desc">Find creators by fashion, food, tech, gaming & more</div></div>
+      <div class="perk-card"><div class="perk-icon">📊</div><div class="perk-title">Real engagement</div><div class="perk-desc">See engagement rate & reel views before contacting</div></div>
+      <div class="perk-card"><div class="perk-icon">💰</div><div class="perk-title">Transparent rates</div><div class="perk-desc">Every creator lists their rate per post upfront</div></div>
+      <div class="perk-card"><div class="perk-icon">⚡</div><div class="perk-title">Direct contact</div><div class="perk-desc">No middlemen — reach creators instantly</div></div>
     </div>
+
+    <div class="form-field">
+      <label>Your brand name</label>
+      <input type="text" id="brand-name" placeholder="e.g. Mamaearth, boAt, Nykaa">
+    </div>
+    <div class="form-field">
+      <label>Work email</label>
+      <input type="email" id="brand-email" placeholder="you@brand.com">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-submit" onclick="submitBrand()">Start discovering creators →</button>
+      <button class="btn-cancel" onclick="closeModal('brandModal')">Maybe later</button>
+    </div>
+  </div>
 </div>
 
-<div class="overlay" id="brandModal">
-    <div class="modal-box">
-        <h2 style="margin-bottom: 20px;">For Brands</h2>
-        <p style="color:var(--muted); margin-bottom: 20px;">Connect with top-tier Indian creators instantly.</p>
-        <input type="email" placeholder="Work Email">
-        <button class="btn-accent" style="width: 100%;" onclick="closeModal('brandModal')">Get Access</button>
+
+<!-- ═══════════════════════════════════════
+     MODAL 3 · SUCCESS
+═══════════════════════════════════════ -->
+<div class="modal-overlay" id="successModal" onclick="overlayClick(event,'successModal')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('successModal')">✕</button>
+    <div class="success-box">
+      <div class="success-ring" id="success-icon">✓</div>
+      <div class="success-title" id="success-title">Done!</div>
+      <div class="success-sub" id="success-sub">Your submission was received.</div>
+      <div class="success-details" id="success-details"></div>
+      <button class="btn-submit" onclick="closeModal('successModal')" style="width:100%">Done ✓</button>
     </div>
+  </div>
 </div>
+
 
 <script>
+// ── DATA ──────────────────────────────────────────────
+const FLEVELS = ["Any","1K","5K","10K","50K","100K","250K","500K","1M","5M","10M+"];
+const FVALUES = [0,1000,5000,10000,50000,100000,250000,500000,1000000,5000000,Infinity];
+const COLORS = {
+  fashion:{bg:'rgba(255,95,160,0.15)',text:'#ff5fa0'},fitness:{bg:'rgba(200,241,53,0.12)',text:'#c8f135'},
+  food:{bg:'rgba(255,140,66,0.15)',text:'#ff8c42'},tech:{bg:'rgba(95,180,255,0.15)',text:'#5fb4ff'},
+  travel:{bg:'rgba(45,212,191,0.15)',text:'#2dd4bf'},beauty:{bg:'rgba(168,85,247,0.15)',text:'#a855f7'},
+  finance:{bg:'rgba(250,204,21,0.12)',text:'#facc15'},gaming:{bg:'rgba(168,85,247,0.15)',text:'#a855f7'},
+  lifestyle:{bg:'rgba(45,212,191,0.15)',text:'#2dd4bf'},comedy:{bg:'rgba(255,140,66,0.15)',text:'#ff8c42'},
+};
+const TIERS = {
+  nano:{label:'Nano',bg:'rgba(45,212,191,0.15)',color:'#2dd4bf'},
+  micro:{label:'Micro',bg:'rgba(95,180,255,0.15)',color:'#5fb4ff'},
+  macro:{label:'Macro',bg:'rgba(168,85,247,0.15)',color:'#a855f7'},
+  mega:{label:'Mega',bg:'rgba(255,95,160,0.15)',color:'#ff5fa0'},
+};
 const creators = [
-  {id:1, name:"Priya Sharma", handle:"@priyastyled", genre:"fashion", followers:"820K", eng:"4.2%", avatar:"PS", bio:"Fashion & lifestyle creator from Mumbai."},
-  {id:2, name:"Arjun Fitness", handle:"@arjunfit", genre:"fitness", followers:"340K", eng:"6.8%", avatar:"AF", bio:"Certified trainer and nutrition expert."},
-  {id:3, name:"TechWala Raj", handle:"@techwalaraj", genre:"tech", followers:"280K", eng:"7.3%", avatar:"TR", bio:"Hindi tech reviews and unboxing."},
-  {id:4, name:"Riya Eats", handle:"@riyaeats", genre:"food", followers:"1.2M", eng:"5.1%", avatar:"RE", bio:"Street food and recipe explorer."}
+  {id:1,name:"Priya Sharma",handle:"@priyastyled",genre:"fashion",followers:820000,eng:4.2,views:1200000,avatar:"PS",icon:"👗",bio:"Fashion & lifestyle creator from Mumbai. Iconic lookbooks, brand collabs & street style content.",rate:"₹45,000",reels:[{e:"👗",v:"2.1M"},{e:"💄",v:"980K"},{e:"✨",v:"750K"},{e:"🛍",v:"600K"}]},
+  {id:2,name:"Arjun Fitness",handle:"@arjunfit",genre:"fitness",followers:340000,eng:6.8,views:890000,avatar:"AF",icon:"💪",bio:"Certified trainer & fitness educator. Workout tips, nutrition science & transformation stories.",rate:"₹22,000",reels:[{e:"💪",v:"1.4M"},{e:"🏋",v:"800K"},{e:"🥗",v:"420K"},{e:"🏃",v:"380K"}]},
+  {id:3,name:"Riya Eats",handle:"@riyaeats",genre:"food",followers:1500000,eng:5.1,views:3200000,avatar:"RE",icon:"🍜",bio:"Restaurant reviews, street food adventures & quick recipes across India.",rate:"₹80,000",reels:[{e:"🍜",v:"5.2M"},{e:"🍕",v:"3.1M"},{e:"🥘",v:"2.8M"},{e:"🧆",v:"1.9M"}]},
+  {id:4,name:"TechWala Raj",handle:"@techwalaraj",genre:"tech",followers:280000,eng:7.3,views:620000,avatar:"TR",icon:"📱",bio:"Unboxings, reviews & tech tips in Hindi. Making technology accessible to every Indian.",rate:"₹18,000",reels:[{e:"📱",v:"1.1M"},{e:"💻",v:"700K"},{e:"🎮",v:"500K"},{e:"📡",v:"320K"}]},
+  {id:5,name:"Wanderer Meera",handle:"@meerawanders",genre:"travel",followers:95000,eng:8.9,views:410000,avatar:"WM",icon:"✈️",bio:"Solo female traveller sharing budget tips & hidden gems across India & South East Asia.",rate:"₹8,000",reels:[{e:"🏔",v:"620K"},{e:"🏖",v:"390K"},{e:"🌅",v:"280K"},{e:"🗺",v:"210K"}]},
+  {id:6,name:"Glamour by Sana",handle:"@sanaglam",genre:"beauty",followers:2100000,eng:4.5,views:4800000,avatar:"GS",icon:"💅",bio:"Makeup tutorials, skincare reviews & beauty hacks trusted by 2M+ fans.",rate:"₹1,20,000",reels:[{e:"💄",v:"7.8M"},{e:"✨",v:"4.2M"},{e:"💅",v:"3.1M"},{e:"🪞",v:"2.4M"}]},
+  {id:7,name:"Dev Finance",handle:"@devfinance",genre:"finance",followers:410000,eng:5.6,views:780000,avatar:"DF",icon:"📊",bio:"Stocks, mutual funds & personal finance simplified for everyday Indians.",rate:"₹28,000",reels:[{e:"📊",v:"1.3M"},{e:"💰",v:"900K"},{e:"📈",v:"600K"},{e:"🏦",v:"450K"}]},
+  {id:8,name:"GamingWithKaran",handle:"@karangames",genre:"gaming",followers:760000,eng:9.1,views:2100000,avatar:"GK",icon:"🎮",bio:"BGMI, mobile gaming & esports. The fastest growing gaming channel in India.",rate:"₹38,000",reels:[{e:"🎮",v:"3.4M"},{e:"🏆",v:"2.1M"},{e:"⚡",v:"1.8M"},{e:"🎯",v:"1.5M"}]},
+  {id:9,name:"Naina Style",handle:"@nainastyle",genre:"fashion",followers:58000,eng:10.2,views:180000,avatar:"NS",icon:"👠",bio:"Sustainable fashion & thrift hauls. Micro-influencer with sky-high engagement.",rate:"₹5,000",reels:[{e:"👠",v:"280K"},{e:"👜",v:"190K"},{e:"🛍",v:"120K"},{e:"🌿",v:"95K"}]},
+  {id:10,name:"Chef Vikram",handle:"@chefvikram",genre:"food",followers:430000,eng:6.2,views:950000,avatar:"CV",icon:"👨‍🍳",bio:"5-star chef turned creator. Gourmet recipes made simple — from your home kitchen.",rate:"₹30,000",reels:[{e:"👨‍🍳",v:"1.6M"},{e:"🍳",v:"1.1M"},{e:"🥩",v:"700K"},{e:"🍰",v:"560K"}]},
+  {id:11,name:"Ananya Wellness",handle:"@ananyafit",genre:"fitness",followers:72000,eng:11.4,views:320000,avatar:"AW",icon:"🧘",bio:"Yoga, pilates & mindful wellness in Hindi & English.",rate:"₹6,500",reels:[{e:"🧘",v:"480K"},{e:"🏃",v:"310K"},{e:"🥦",v:"200K"},{e:"🌸",v:"170K"}]},
+  {id:12,name:"TravelBro Sid",handle:"@travelsidd",genre:"travel",followers:1800000,eng:3.8,views:2900000,avatar:"TS",icon:"🌍",bio:"International travel, luxury stays & adventure sports.",rate:"₹95,000",reels:[{e:"🌍",v:"4.2M"},{e:"🏄",v:"2.8M"},{e:"🏕",v:"1.9M"},{e:"🚀",v:"1.4M"}]},
+  {id:13,name:"Memes by Sahil",handle:"@sahilmemes",genre:"comedy",followers:1200000,eng:12.1,views:5100000,avatar:"MS",icon:"😂",bio:"India's most viral comedy creator. Relatable memes, skits & trending audio content.",rate:"₹65,000",reels:[{e:"😂",v:"8.1M"},{e:"🤣",v:"5.6M"},{e:"🎭",v:"3.9M"},{e:"⚡",v:"2.8M"}]},
+  {id:14,name:"Neha Lifestyle",handle:"@nehavibes",genre:"lifestyle",followers:390000,eng:7.8,views:820000,avatar:"NL",icon:"🌟",bio:"Morning routines, home decor & mindful living. Aesthetic content that inspires.",rate:"₹24,000",reels:[{e:"🌟",v:"1.2M"},{e:"🏡",v:"780K"},{e:"☕",v:"530K"},{e:"📚",v:"410K"}]},
+  {id:15,name:"StartupWala",handle:"@startupwala",genre:"finance",followers:88000,eng:9.3,views:290000,avatar:"SW",icon:"🚀",bio:"Startup stories, founder interviews & business tips for Indian entrepreneurs.",rate:"₹7,000",reels:[{e:"🚀",v:"450K"},{e:"💡",v:"320K"},{e:"📈",v:"240K"},{e:"🤝",v:"180K"}]},
+  {id:16,name:"Preet Comedy",handle:"@preetcomedy",genre:"comedy",followers:3400000,eng:8.6,views:8900000,avatar:"PC",icon:"🎭",bio:"Viral comedy skits & Punjabi humor. India's top comedy creator.",rate:"₹2,00,000",reels:[{e:"🎭",v:"12M"},{e:"😂",v:"9.4M"},{e:"🤣",v:"7.2M"},{e:"⚡",v:"5.8M"}]},
 ];
 
-function render() {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = creators.map(c => `
-        <div class="creator-card" onmousemove="tilt(event, this)" onmouseleave="resetTilt(this)" onclick="openDetail(${c.id})">
-            <div class="card-content">
-                <div class="avatar">${c.avatar}</div>
-                <h3>${c.name}</h3>
-                <p style="color:var(--muted); font-size: 14px;">${c.handle}</p>
-                <div style="margin-top: 15px; display: flex; justify-content: space-between;">
-                    <span><b>${c.followers}</b></span>
-                    <span style="color:var(--accent)">${c.eng}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
+// ── STATE ─────────────────────────────────────────────
+let activeGenre = 'all', selectedId = null;
+
+// ── MODAL HELPERS ─────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function overlayClick(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') ['creatorModal','brandModal','successModal'].forEach(closeModal);
+});
+
+function showSuccess(icon, title, sub, rows) {
+  document.getElementById('success-icon').textContent = icon;
+  document.getElementById('success-title').textContent = title;
+  document.getElementById('success-sub').textContent = sub;
+  document.getElementById('success-details').innerHTML = rows.map(r =>
+    `<div class="sdr"><span class="k">${r[0]}</span><span class="v" ${r[2]?`style="color:${r[2]}"`:''} >${r[1]}</span></div>`
+  ).join('');
+  openModal('successModal');
 }
 
-// 3D Tilt Logic
-function tilt(e, card) {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = (y - centerY) / 10;
-    const rotateY = (centerX - x) / 10;
+// ── CREATOR SUBMIT ────────────────────────────────────
+function submitCreator(e) {
+  e.preventDefault();
+  const err = document.getElementById('cf-err');
+  const btn = document.getElementById('cf-btn');
+  const name      = document.getElementById('cf-name').value.trim();
+  const handle    = document.getElementById('cf-handle').value.trim();
+  const genre     = document.getElementById('cf-genre').value;
+  const followers = document.getElementById('cf-followers').value;
+  const email     = document.getElementById('cf-email').value.trim();
+  const rate      = document.getElementById('cf-rate').value.trim();
 
-    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+  if (!name || !handle || !genre || !followers || !email) {
+    err.textContent = 'Please fill in all required fields marked with *'; err.style.display = 'block'; return;
+  }
+  if (!email.includes('@')) {
+    err.textContent = 'Please enter a valid email address'; err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  setTimeout(() => {
+    btn.disabled = false; btn.textContent = 'Submit profile →';
+    document.getElementById('cf-name').value = '';
+    document.getElementById('cf-handle').value = '';
+    document.getElementById('cf-genre').value = '';
+    document.getElementById('cf-followers').value = '';
+    document.getElementById('cf-rate').value = '';
+    document.getElementById('cf-email').value = '';
+    document.getElementById('cf-bio').value = '';
+    closeModal('creatorModal');
+    const f = parseInt(followers);
+    const fmtF = f>=1000000?(f/1000000).toFixed(1)+'M':f>=1000?(f/1000).toFixed(0)+'K':f;
+    showSuccess('🎉', "You're listed!", "Your creator profile has been submitted. Brands browsing CreatorFind will now be able to discover and contact you.", [
+      ['Name', name],
+      ['Handle', handle],
+      ['Genre', genre],
+      ['Followers', fmtF],
+      ...(rate ? [['Rate', rate]] : []),
+      ['Email', email],
+      ['Status', 'Live on platform', '#c8f135'],
+    ]);
+  }, 900);
 }
 
-function resetTilt(card) {
-    card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+// ── BRAND SUBMIT ──────────────────────────────────────
+function submitBrand() {
+  const brandName  = document.getElementById('brand-name').value.trim();
+  const brandEmail = document.getElementById('brand-email').value.trim();
+  closeModal('brandModal');
+  showSuccess('🚀', 'Welcome' + (brandName ? ', ' + brandName : '') + '!', 'You now have full access to browse and contact all creators on the platform. Use the filters below to find your match.', [
+    ['Access level', 'Full access unlocked', '#c8f135'],
+    ...(brandName  ? [['Brand', brandName]] : []),
+    ...(brandEmail ? [['Email', brandEmail]] : []),
+    ['Creators available', creators.length + ' creators'],
+  ]);
 }
 
+// ── HELPERS ───────────────────────────────────────────
+function fmt(n) { if(n>=1000000)return(n/1000000).toFixed(1)+'M'; if(n>=1000)return(n/1000).toFixed(0)+'K'; return n.toString(); }
+function tierOf(f) { if(f<10000)return'nano'; if(f<100000)return'micro'; if(f<1000000)return'macro'; return'mega'; }
+function col(g) { return COLORS[g]||{bg:'rgba(122,122,144,0.15)',text:'#7a7a90'}; }
+
+// ── FILTER ────────────────────────────────────────────
+function getFiltered() {
+  const minF=FVALUES[+document.getElementById('minF').value];
+  const maxF=FVALUES[+document.getElementById('maxF').value];
+  const tier=document.getElementById('tierSel').value;
+  const sort=document.getElementById('sortSel').value;
+  let list=creators.filter(c=>{
+    if(activeGenre!=='all'&&c.genre!==activeGenre)return false;
+    if(c.followers<minF||c.followers>maxF)return false;
+    if(tier!=='all'&&tierOf(c.followers)!==tier)return false;
+    return true;
+  });
+  if(sort==='followers')list.sort((a,b)=>b.followers-a.followers);
+  else if(sort==='engagement')list.sort((a,b)=>b.eng-a.eng);
+  else list.sort((a,b)=>b.views-a.views);
+  return list;
+}
+
+// ── RENDER CARD ───────────────────────────────────────
+function renderCard(c, delay) {
+  const c2=col(c.genre), t=TIERS[tierOf(c.followers)];
+  return `<div class="creator-card${selectedId===c.id?' selected':''}" style="animation-delay:${delay}ms" onclick="openDetail(${c.id})">
+    <div class="tier-badge" style="background:${t.bg};color:${t.color}">${t.label}</div>
+    <div class="card-cover" style="background:${c2.bg}"><span style="font-size:36px">${c.icon}</span></div>
+    <div class="card-body">
+      <div class="card-avatar" style="background:${c2.bg};color:${c2.text}">${c.avatar}</div>
+      <div class="card-name">${c.name}</div>
+      <div class="card-handle">${c.handle}</div>
+      <div class="card-genre" style="background:${c2.bg};color:${c2.text}">${c.genre}</div>
+      <div class="card-reels">${c.reels.slice(0,3).map(r=>`<div class="reel-chip" style="background:${c2.bg}"><span style="font-size:18px">${r.e}</span><span class="reel-views">${r.v}</span></div>`).join('')}</div>
+      <div class="card-meta">
+        <div class="meta-item"><span class="meta-val">${fmt(c.followers)}</span><span class="meta-lbl">Followers</span></div>
+        <div class="meta-item"><span class="meta-val">${c.eng}%</span><span class="meta-lbl">Engagement</span></div>
+        <div class="meta-item"><span class="meta-val">${fmt(c.views)}</span><span class="meta-lbl">Avg views</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── RENDER DETAIL ─────────────────────────────────────
 function openDetail(id) {
-    const c = creators.find(x => x.id === id);
-    const panel = document.getElementById('detailPanel');
-    document.getElementById('panelContent').innerHTML = `
-        <h1 style="font-family:Syne; font-size:40px;">${c.name}</h1>
-        <p class="accent">${c.handle}</p>
-        <p style="margin: 20px 0; line-height: 1.6;">${c.bio}</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div style="background:#0a0a0f; padding:20px; border-radius:15px;">
-                <small>Followers</small><h2>${c.followers}</h2>
-            </div>
-            <div style="background:#0a0a0f; padding:20px; border-radius:15px;">
-                <small>Engagement</small><h2>${c.eng}</h2>
-            </div>
-        </div>
-        <button class="btn-accent" style="width:100%; margin-top:40px; padding:20px;">Contact Creator →</button>
-    `;
-    panel.classList.add('open');
+  selectedId=id;
+  const c=creators.find(x=>x.id===id), c2=col(c.genre), t=TIERS[tierOf(c.followers)];
+  const panel=document.getElementById('detailPanel');
+  panel.innerHTML=`
+    <div class="dp-header">
+      <div class="dp-avatar" style="background:${c2.bg};color:${c2.text}">${c.avatar}</div>
+      <div class="dp-info">
+        <div class="dp-name">${c.name}</div>
+        <div class="dp-handle">${c.handle} · <span style="color:${c2.text}">${c.genre}</span> · <span style="background:${t.bg};color:${t.color};padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600">${t.label}</span></div>
+        <div class="dp-bio">${c.bio}</div>
+      </div>
+      <button onclick="closeDetail()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0">✕ Close</button>
+    </div>
+    <div class="dp-stats">
+      <div class="dp-stat"><span class="v">${fmt(c.followers)}</span><span class="l">Followers</span></div>
+      <div class="dp-stat"><span class="v">${c.eng}%</span><span class="l">Engagement</span></div>
+      <div class="dp-stat"><span class="v">${fmt(c.views)}</span><span class="l">Avg reel views</span></div>
+      <div class="dp-stat"><span class="v">${c.rate}</span><span class="l">Rate per post</span></div>
+    </div>
+    <div class="dp-reels-title">Top reels</div>
+    <div class="dp-reels">${c.reels.map(r=>`<div class="dp-reel"><div class="dp-reel-cover" style="background:${c2.bg}">${r.e}</div><div class="dp-reel-views">${r.v} views</div></div>`).join('')}</div>
+    <div class="dp-footer">
+      <button class="btn-contact" onclick="contactCreator('${c.name}','${c.handle}','${c.rate}')">Contact creator →</button>
+      <button class="btn-save">♡ Save</button>
+      <div class="dp-rate">${c.rate} <span>/ post</span></div>
+    </div>`;
+  panel.classList.add('open');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  render();
 }
 
-function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); }
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function closeDetail() { selectedId=null; document.getElementById('detailPanel').classList.remove('open'); render(); }
 
+function contactCreator(name, handle, rate) {
+  showSuccess('📩', 'Contact request sent!', 'Your interest in this creator has been noted. In the full version, this sends them a message or reveals their contact details.', [
+    ['Creator', name],
+    ['Handle', handle],
+    ['Rate', rate],
+    ['Next step', 'Connect Supabase to notify creator', '#c8f135'],
+  ]);
+}
+
+// ── MAIN RENDER ───────────────────────────────────────
+function render() {
+  const list=getFiltered();
+  const grid=document.getElementById('grid');
+  document.getElementById('countDisplay').textContent=list.length;
+  document.getElementById('stat-count').textContent=creators.length;
+  if(list.length){
+    document.getElementById('statReach').textContent=fmt(Math.round(list.reduce((a,c)=>a+c.followers,0)/list.length));
+    document.getElementById('statEng').textContent=(list.reduce((a,c)=>a+c.eng,0)/list.length).toFixed(1)+'%';
+    document.getElementById('statTotal').textContent=fmt(list.reduce((a,c)=>a+c.followers,0));
+  }
+  if(!list.length){grid.innerHTML='';document.getElementById('empty').classList.add('show');}
+  else{document.getElementById('empty').classList.remove('show');grid.innerHTML=list.map((c,i)=>renderCard(c,i*30)).join('');}
+  if(selectedId&&!list.find(c=>c.id===selectedId))closeDetail();
+}
+
+// ── EVENTS ────────────────────────────────────────────
+document.getElementById('genrePills').addEventListener('click',e=>{
+  const p=e.target.closest('.pill'); if(!p)return;
+  document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+  p.classList.add('active'); activeGenre=p.dataset.genre; closeDetail(); render();
+});
+['minF','maxF'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById('minFVal').textContent=FLEVELS[+document.getElementById('minF').value];
+    document.getElementById('maxFVal').textContent=FLEVELS[+document.getElementById('maxF').value];
+    render();
+  });
+});
+document.getElementById('tierSel').addEventListener('change',render);
+document.getElementById('sortSel').addEventListener('change',render);
+
+// ── INIT ──────────────────────────────────────────────
 render();
+let cnt=0;
+const timer=setInterval(()=>{cnt=Math.min(cnt+1,creators.length);document.getElementById('stat-count').textContent=cnt;if(cnt>=creators.length)clearInterval(timer);},60);
 </script>
 </body>
 </html>
